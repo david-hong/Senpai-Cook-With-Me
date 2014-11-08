@@ -1,6 +1,7 @@
 package com.htmlparser.app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,8 +40,20 @@ public class MainActivity extends Activity {
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             }
         });
+        //Button btnNewRec = (Button)findViewById(R.id.btnNewRecipe);
+        /*btnNewRec.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this , NewRecipe.class);
+                startActivity(intent);
+            }
+        });*/
     }
 
+    public void newRec(View view){
+        Intent intent = new Intent(this,NewRecipe.class);
+        startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -60,7 +73,6 @@ public class MainActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     private class ParseURL extends AsyncTask<String, Void, String> {
 
@@ -101,5 +113,6 @@ public class MainActivity extends Activity {
             super.onPostExecute(s);
             respText.setText(s);
         }
+
     }
 }

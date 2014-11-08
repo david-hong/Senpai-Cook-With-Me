@@ -2,7 +2,12 @@
 <resources>
 
     <string name="app_name">HTMLParser</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="newRec_TITLE">Making a New Recipe</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_new_recipe">NewRecipe</string>
+
+    <dimen name="titleSize">25sp</dimen>
+
+    <string name="hello_world">Hello world!</string>
 
 </resources>
