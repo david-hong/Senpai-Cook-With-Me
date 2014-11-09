@@ -37,7 +37,11 @@ public class MainActivity extends Activity {
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+<<<<<<< HEAD
                 String siteUrl = edtUrl.getText().toString().toLowerCase();
+=======
+                String siteUrl = edtUrl.getText().toString();
+>>>>>>> origin/master
                 if(siteUrl.trim().length() != 0) {
                     siteUrl.toLowerCase();
                     if (!(siteUrl.substring(0, Math.min(siteUrl.length(), 7)).equals("http://")))
