@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this,NewRecipe.class);
         int count = 0;
         String name = "item0";
-        intent.putExtra(name,"testing");
+        intent.putExtra(name,"Senpai you did not enter a recipe");
         while (directions.current != null)
         {
             intent.putExtra(name, directions.current.value);
@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
     }
 
     class Node{
-        String value ="";
+        String value = "";
         Node next = null;
         Node prev = null;
 
@@ -89,6 +89,7 @@ public class MainActivity extends Activity {
             this.value = str;
         }
     }
+
 
     class Directions implements Serializable{
         Node current = null;
@@ -102,7 +103,7 @@ public class MainActivity extends Activity {
         }
 
         protected void add(String str){
-            if (this.current != null) {
+            if(this.current != null) {
                 Node holder = this.current;
                 while (holder.next != null)
                     holder = holder.next;
@@ -110,7 +111,7 @@ public class MainActivity extends Activity {
                 holder.next.prev = holder;
             }
             else
-                this.current= new Node(str);
+                this.current = new Node(str);
         }
 
         public String toString(){
@@ -153,18 +154,18 @@ public class MainActivity extends Activity {
 
                 Elements topicList = doc.select(classFind);
                 if(!buffer.toString().equals("Error only accepts recipes from http://www.foodnetwork.ca/, http://allrecipes.com/, http://www.food.com/")){
-                buffer.append("Directions \r\n");
-                  for (Element topic : topicList) {
-                      String data = topic.text();
-                      directions.add(data);
-                      buffer.append(data + "\r\n");
-                  }
-                }
+                    buffer.append("Directions \r\n");
+                      for (Element topic : topicList) {
+                          String data = topic.text();
+                          directions.add(data);
+                          buffer.append(data + "\r\n");
+                      }
+                    }
             }
             catch(Throwable t) {
                 t.printStackTrace();
             }
-            return buffer.toString();
+            return directions.current.value;
         }
 
         @Override

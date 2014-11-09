@@ -10,8 +10,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.speech.tts.TextToSpeech;
 
 import android.text.method.ScrollingMovementMethod;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -19,18 +21,25 @@ import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
 import ai.wit.sdk.IWitListener;
 import ai.wit.sdk.Wit;
 import ai.wit.sdk.model.WitOutcome;
+import com.example.feastbeast.MainActivity.Directions;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class NewRecipe extends ActionBarActivity implements IWitListener{
+public class NewRecipe extends ActionBarActivity implements IWitListener, TextToSpeech.OnInitListener {
 
     Wit _wit;
+    private TextToSpeech tts;
+    private Button btnSpeak;
+    protected Directions directions;
     List list = new ArrayList();
-    int indice = 0;
+    double d = 0.7;
+    float f = (float) d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,18 +47,67 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
         setContentView(R.layout.activity_new_recipe);
         String accessToken = "U55JDKGFF6CYR3XV64RJTTCX3OQZKL57";
         _wit = new Wit(accessToken, this);
-        TextView x = (TextView)findViewById(R.id.txtText);
         //_wit.enableContextLocation(getApplicationContext());
+        tts = new TextToSpeech(this, this);
+        tts.setSpeechRate(f);
+        btnSpeak = (Button) findViewById(R.id.butnSpeak);
+
         Intent intent = getIntent();
         String name = "item0";
         int count = 0;
         String temp = intent.getExtras().getString(name);
-        while (temp != null){
+        while (temp != null) {
             list.add(temp);
             count++;
-            name="item"+count;
+            name = "item" + count;
             temp = intent.getExtras().getString(name);
         }
+
+        // button on click event
+        btnSpeak.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                speakOut();
+            }
+
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        // Don't forget to shutdown tts!
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onInit(int status) {
+
+        if (status == TextToSpeech.SUCCESS) {
+
+            int result = tts.setLanguage(Locale.US);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This Language is not supported");
+            } else {
+                btnSpeak.setEnabled(true);
+                speakOut();
+            }
+
+        } else {
+            Log.e("TTS", "Initilization Failed!");
+        }
+
+    }
+
+    private void speakOut() {
+        if(list.size() != 0)
+            tts.speak((String) list.get(0), TextToSpeech.QUEUE_FLUSH, null);
     }
 
     @Override
@@ -93,12 +151,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
             return ;
         }
         String jsonOutput = gson.toJson(witOutcomes);
-
-        if (jsonOutput.indexOf("next_step") != -1)
-            next_step();
-        else if (jsonOutput.indexOf("prev_step") != -1)
-            prev_step();
-
         jsonView.setText(jsonOutput);
         ((TextView) findViewById(R.id.txtText)).setText("Done!");
     }
@@ -131,13 +183,5 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
             return inflater.inflate(R.layout.wit_button, container, false);
         }
     }
-    public void next_step()
-    {
-        indice++;
-    }
-    public void prev_step()
-    {
-        if (indice != 0)
-            indice--;
-    }
+
 }
