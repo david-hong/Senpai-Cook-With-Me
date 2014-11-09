@@ -40,6 +40,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     List list = new ArrayList();
     double d = 0.7;
     float f = (float) d;
+    int indice = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +152,12 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             return ;
         }
         String jsonOutput = gson.toJson(witOutcomes);
+
+        if (jsonOutput.indexOf("next_step") != -1)
+            next_step();
+        else if (jsonOutput.indexOf("prev_step") != -1)
+            prev_step();
+
         jsonView.setText(jsonOutput);
         ((TextView) findViewById(R.id.txtText)).setText("Done!");
     }
@@ -183,5 +190,13 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             return inflater.inflate(R.layout.wit_button, container, false);
         }
     }
-
+    public void next_step()
+    {
+        indice++;
+    }
+    public void prev_step()
+    {
+        if (indice != 0)
+            indice--;
+    }
 }

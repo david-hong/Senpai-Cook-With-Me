@@ -37,10 +37,15 @@ public class MainActivity extends Activity {
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String siteUrl = edtUrl.getText().toString().toLowerCase();
-                if (! (siteUrl.substring(0, Math.min(siteUrl.length(), 7)).equals("http://")))
-                    siteUrl = "http://" + siteUrl;
-                ( new ParseURL() ).execute(new String[]{siteUrl});
+                String siteUrl = edtUrl.getText().toString();
+                if(siteUrl.trim().length() != 0) {
+                    siteUrl.toLowerCase();
+                    if (!(siteUrl.substring(0, Math.min(siteUrl.length(), 7)).equals("http://")))
+                        siteUrl = "http://" + siteUrl;
+                    (new ParseURL()).execute(new String[]{siteUrl});
+                }
+                else
+                    respText.setText("error, you need to enter a URL");
             }
         });
     }
