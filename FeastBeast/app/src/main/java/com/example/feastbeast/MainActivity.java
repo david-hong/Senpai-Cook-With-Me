@@ -49,8 +49,16 @@ public class MainActivity extends Activity {
         //EditText x = (EditText)findViewById(R.id.edtURL);
         //x.setText(directions.current.value);
         Intent intent = new Intent(this,NewRecipe.class);
-        String name = "item";
-        intent.putExtra(name, directions.current.value);
+        int count = 0;
+        String name = "item0";
+        intent.putExtra(name,"testing");
+        while (directions.current != null)
+        {
+            intent.putExtra(name, directions.current.value);
+            count++;
+            name="item"+count;
+            directions.current=directions.current.next;
+        }
         startActivity(intent);
     }
 
@@ -133,7 +141,7 @@ public class MainActivity extends Activity {
                 buffer.append("Title: " + title + "\r\n");
 
                 if(strings[0].substring(0, Math.min(strings[0].length(), 26)).equals("http://www.foodnetwork.ca/"))
-                    classFind = ".recipeInstructions";
+                    classFind = ".recipeInstructions p";
                 else if(strings[0].substring(0, Math.min(strings[0].length(), 22)).equals("http://allrecipes.com/"))
                     classFind = ".directions li";
                 else if(strings[0].substring(0, Math.min(strings[0].length(), 20)).equals("http://www.food.com/"))
@@ -156,7 +164,7 @@ public class MainActivity extends Activity {
             catch(Throwable t) {
                 t.printStackTrace();
             }
-            return directions.current.value;
+            return buffer.toString();
         }
 
         @Override

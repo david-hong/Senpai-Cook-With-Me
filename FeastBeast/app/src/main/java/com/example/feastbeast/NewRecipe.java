@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,17 +19,18 @@ import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import ai.wit.sdk.IWitListener;
 import ai.wit.sdk.Wit;
 import ai.wit.sdk.model.WitOutcome;
-import com.example.feastbeast.MainActivity.Directions;
 
 
 public class NewRecipe extends ActionBarActivity implements IWitListener{
 
     Wit _wit;
-    protected Directions directions;
+    List list = new ArrayList();
+    int indice = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +41,15 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
         TextView x = (TextView)findViewById(R.id.txtText);
         //_wit.enableContextLocation(getApplicationContext());
         Intent intent = getIntent();
-        String temp = intent.getExtras().getString("item");
-        //directions = (Directions)intent.getSerializableExtra("directions");
-        x.setText(temp);
+        String name = "item0";
+        int count = 0;
+        String temp = intent.getExtras().getString(name);
+        while (temp != null){
+            list.add(temp);
+            count++;
+            name="item"+count;
+            temp = intent.getExtras().getString(name);
+        }
     }
 
     @Override
@@ -85,6 +93,12 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
             return ;
         }
         String jsonOutput = gson.toJson(witOutcomes);
+
+        if (jsonOutput.indexOf("next_step") != -1)
+            next_step();
+        else if (jsonOutput.indexOf("prev_step") != -1)
+            prev_step();
+
         jsonView.setText(jsonOutput);
         ((TextView) findViewById(R.id.txtText)).setText("Done!");
     }
@@ -119,12 +133,11 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
     }
     public void next_step()
     {
-        TextView x = (TextView)findViewById(R.id.txtText);
-        String content = x.getText().toString();
-        if (directions != null)
-        {
-            directions.current = directions.current.next;
-            x.setText(content + "   CHANGED");
-        }
+        indice++;
+    }
+    public void prev_step()
+    {
+        if (indice != 0)
+            indice--;
     }
 }
