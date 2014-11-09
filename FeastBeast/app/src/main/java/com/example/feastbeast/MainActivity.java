@@ -38,9 +38,14 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 String siteUrl = edtUrl.getText().toString().toLowerCase();
-                if (! (siteUrl.substring(0, Math.min(siteUrl.length(), 7)).equals("http://")))
-                    siteUrl = "http://" + siteUrl;
-                ( new ParseURL() ).execute(new String[]{siteUrl});
+                if(siteUrl.trim().length() != 0) {
+                    siteUrl.toLowerCase();
+                    if (!(siteUrl.substring(0, Math.min(siteUrl.length(), 7)).equals("http://")))
+                        siteUrl = "http://" + siteUrl;
+                    (new ParseURL()).execute(new String[]{siteUrl});
+                }
+                else
+                    respText.setText("error, you need to enter a URL");
             }
         });
     }
@@ -51,7 +56,7 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this,NewRecipe.class);
         int count = 0;
         String name = "item0";
-        intent.putExtra(name,"Senpai you did not enter a recipe");
+        intent.putExtra(name,"Senpye you did not enter a recipe");
         while (directions.current != null)
         {
             intent.putExtra(name, directions.current.value);

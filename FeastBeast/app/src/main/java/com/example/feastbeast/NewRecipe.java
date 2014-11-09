@@ -38,6 +38,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     private Button btnSpeak;
     protected Directions directions;
     List list = new ArrayList();
+    int indice = 0;
     double d = 0.7;
     float f = (float) d;
 
@@ -50,12 +51,18 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         //_wit.enableContextLocation(getApplicationContext());
         tts = new TextToSpeech(this, this);
         tts.setSpeechRate(f);
-        btnSpeak = (Button) findViewById(R.id.butnSpeak);
+        //btnSpeak = (Button) findViewById(R.id.butnSpeak);
 
         Intent intent = getIntent();
         String name = "item0";
         int count = 0;
         String temp = intent.getExtras().getString(name);
+        if (temp == null){
+            list.add("Senpai you did not enter a recipe");
+            speakOut(0);
+            list.remove(0);
+        }
+
         while (temp != null) {
             list.add(temp);
             count++;
@@ -64,14 +71,14 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         }
 
         // button on click event
-        btnSpeak.setOnClickListener(new View.OnClickListener() {
+        /*btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                speakOut();
+                speakOut(indice);
             }
 
-        });
+        });*/
     }
 
     @Override
@@ -84,6 +91,27 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         super.onDestroy();
     }
 
+    public void next_step()
+    {
+        if (indice + 1 < this.list.size()) {
+            indice++;
+            speakOut(indice);
+        }
+    }
+    public void prev_step()
+    {
+        if (indice != 0 && indice < this.list.size()) {
+            indice--;
+            speakOut(indice);
+        }
+    }
+
+    public void repeat_step()
+    {
+        if (indice < this.list.size())
+            speakOut(indice);
+    }
+
     @Override
     public void onInit(int status) {
 
@@ -91,23 +119,24 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
             int result = tts.setLanguage(Locale.US);
 
-            if (result == TextToSpeech.LANG_MISSING_DATA
+            /*if (result == TextToSpeech.LANG_MISSING_DATA
                     || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e("TTS", "This Language is not supported");
             } else {
                 btnSpeak.setEnabled(true);
-                speakOut();
-            }
+                speakOut(indice);
+            }*/
 
         } else {
             Log.e("TTS", "Initilization Failed!");
         }
+        speakOut(0);
 
     }
 
-    private void speakOut() {
+    private void speakOut(int i) {
         if(list.size() != 0)
-            tts.speak((String) list.get(0), TextToSpeech.QUEUE_FLUSH, null);
+            tts.speak((String) list.get(i), TextToSpeech.QUEUE_FLUSH, null);
     }
 
     @Override
@@ -152,6 +181,14 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         }
         String jsonOutput = gson.toJson(witOutcomes);
         jsonView.setText(jsonOutput);
+
+        if (jsonOutput.indexOf("next_step") != -1)
+            next_step();
+        else if (jsonOutput.indexOf("prev_step") != -1)
+            prev_step();
+        else if (jsonOutput.indexOf("repeat_step") != -1)
+            repeat_step();
+
         ((TextView) findViewById(R.id.txtText)).setText("Done!");
     }
 
