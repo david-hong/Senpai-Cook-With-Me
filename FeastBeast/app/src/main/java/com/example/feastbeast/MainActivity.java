@@ -24,7 +24,7 @@ import java.io.Serializable;
 public class MainActivity extends Activity {
 
     private TextView respText;
-    public Directions directions;
+    public Directions directions = new Directions();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +46,11 @@ public class MainActivity extends Activity {
     }
 
     public void newRec(View view){
+        //EditText x = (EditText)findViewById(R.id.edtURL);
+        //x.setText(directions.current.value);
         Intent intent = new Intent(this,NewRecipe.class);
-        intent.putExtra("directions", directions);
+        String name = "item";
+        intent.putExtra(name, directions.current.value);
         startActivity(intent);
     }
 
@@ -83,7 +86,7 @@ public class MainActivity extends Activity {
         Node current = null;
 
         public Directions(){
-            this.current = new Node("");
+            this.current = null;
         }
 
         public Directions(String str){
@@ -91,11 +94,15 @@ public class MainActivity extends Activity {
         }
 
         protected void add(String str){
-            Node holder = this.current;
-            while(holder.next != null)
-                holder = holder.next;
-            holder.next = new Node(str);
-            holder.next.prev = holder;
+            if (this.current != null) {
+                Node holder = this.current;
+                while (holder.next != null)
+                    holder = holder.next;
+                holder.next = new Node(str);
+                holder.next.prev = holder;
+            }
+            else
+                this.current= new Node(str);
         }
 
         public String toString(){
@@ -112,7 +119,6 @@ public class MainActivity extends Activity {
     protected class ParseURL extends AsyncTask<String, Void, String> {
 
         String classFind = "li";
-        Directions directions = new Directions();
 
         @Override
         protected String doInBackground(String... strings) {
@@ -150,7 +156,7 @@ public class MainActivity extends Activity {
             catch(Throwable t) {
                 t.printStackTrace();
             }
-            return directions.toString();
+            return directions.current.value;
         }
 
         @Override

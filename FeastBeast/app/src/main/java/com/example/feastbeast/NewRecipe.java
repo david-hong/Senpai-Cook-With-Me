@@ -36,11 +36,13 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
         setContentView(R.layout.activity_new_recipe);
         String accessToken = "U55JDKGFF6CYR3XV64RJTTCX3OQZKL57";
         _wit = new Wit(accessToken, this);
+        TextView x = (TextView)findViewById(R.id.txtText);
         //_wit.enableContextLocation(getApplicationContext());
         Intent intent = getIntent();
-        Directions directions = (Directions)intent.getSerializableExtra("directions");
+        String temp = intent.getExtras().getString("item");
+        //directions = (Directions)intent.getSerializableExtra("directions");
+        x.setText(temp);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,6 +115,16 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
                                  Bundle savedInstanceState) {
             // Inflate the layout for this fragment
             return inflater.inflate(R.layout.wit_button, container, false);
+        }
+    }
+    public void next_step()
+    {
+        TextView x = (TextView)findViewById(R.id.txtText);
+        String content = x.getText().toString();
+        if (directions != null)
+        {
+            directions.current = directions.current.next;
+            x.setText(content + "   CHANGED");
         }
     }
 }
