@@ -18,10 +18,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.Serializable;
+
 
 public class MainActivity extends Activity {
 
     private TextView respText;
+    public Directions directions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,7 @@ public class MainActivity extends Activity {
 
     public void newRec(View view){
         Intent intent = new Intent(this,NewRecipe.class);
+        intent.putExtra("directions", directions);
         startActivity(intent);
     }
 
@@ -75,8 +79,7 @@ public class MainActivity extends Activity {
         }
     }
 
-
-    class Directions{
+    class Directions implements Serializable{
         Node current = null;
 
         public Directions(){
