@@ -1,6 +1,7 @@
 package com.example.feastbeast;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -21,12 +22,13 @@ import java.util.ArrayList;
 import ai.wit.sdk.IWitListener;
 import ai.wit.sdk.Wit;
 import ai.wit.sdk.model.WitOutcome;
-
+import com.example.feastbeast.MainActivity.Directions;
 
 
 public class NewRecipe extends ActionBarActivity implements IWitListener{
 
     Wit _wit;
+    protected Directions directions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,8 @@ public class NewRecipe extends ActionBarActivity implements IWitListener{
         String accessToken = "U55JDKGFF6CYR3XV64RJTTCX3OQZKL57";
         _wit = new Wit(accessToken, this);
         //_wit.enableContextLocation(getApplicationContext());
+        Intent intent = getIntent();
+        Directions directions = (Directions)intent.getSerializableExtra("directions");
     }
 
 
