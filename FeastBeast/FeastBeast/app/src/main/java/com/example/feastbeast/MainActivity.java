@@ -1,7 +1,6 @@
 package com.example.feastbeast;
 
 import android.app.Activity;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,34 +30,19 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Typeface brandonGrotesque = Typeface.createFromAsset(getAssets(), "fonts/Brandon_blk.otf");
 
         final EditText edtUrl = (EditText) findViewById(R.id.edtURL);
-        final TextView txt1 = (TextView) findViewById(R.id.txt1);
         Button btnGo = (Button) findViewById(R.id.btnGo);
-        btnGo.setTypeface(brandonGrotesque);
-        txt1.setTypeface(brandonGrotesque);
-
         respText = (TextView) findViewById(R.id.edtResp);
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-<<<<<<< HEAD
                 String siteUrl = edtUrl.getText().toString().toLowerCase();
-=======
-                String siteUrl = edtUrl.getText().toString();
->>>>>>> origin/master
                 if(siteUrl.trim().length() != 0) {
                     siteUrl.toLowerCase();
                     if (!(siteUrl.substring(0, Math.min(siteUrl.length(), 7)).equals("http://")))
                         siteUrl = "http://" + siteUrl;
                     (new ParseURL()).execute(new String[]{siteUrl});
-                    if(directions.current != null)
-                        newRec(view);
-                    /*
-                    else
-                        onClick(view);
-                     */
                 }
                 else
                     respText.setText("error, you need to enter a URL");
@@ -95,7 +79,9 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        if (id == R.id.action_settings) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
