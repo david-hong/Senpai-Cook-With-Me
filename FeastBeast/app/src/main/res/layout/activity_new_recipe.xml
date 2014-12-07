@@ -46,16 +46,4 @@
         android:scrollbars = "vertical"
         />
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Meow!"
-        android:id="@+id/butnSpeak" />
->>>>>>> origin/master
-
->>>>>>> origin/master
 </RelativeLayout>
