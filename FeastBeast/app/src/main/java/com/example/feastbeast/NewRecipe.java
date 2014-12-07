@@ -38,7 +38,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     private Button btnSpeak;
     protected Directions directions;
     List list = new ArrayList();
-    int indice = 0;
     double d = 0.7;
     float f = (float) d;
     int indice = 0;
@@ -58,12 +57,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         String name = "item0";
         int count = 0;
         String temp = intent.getExtras().getString(name);
-        if (temp == null){
-            list.add("Senpai you did not enter a recipe");
-            speakOut(0);
-            list.remove(0);
-        }
-
         while (temp != null) {
             list.add(temp);
             count++;
@@ -77,7 +70,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
             @Override
             public void onClick(View arg0) {
-                speakOut(indice);
+                speakOut();
             }
 
         });*/
@@ -93,27 +86,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         super.onDestroy();
     }
 
-    public void next_step()
-    {
-        if (indice + 1 < this.list.size()) {
-            indice++;
-            speakOut(indice);
-        }
-    }
-    public void prev_step()
-    {
-        if (indice != 0 && indice < this.list.size()) {
-            indice--;
-            speakOut(indice);
-        }
-    }
-
-    public void repeat_step()
-    {
-        if (indice < this.list.size())
-            speakOut(indice);
-    }
-
     @Override
     public void onInit(int status) {
 
@@ -126,21 +98,13 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
                 Log.e("TTS", "This Language is not supported");
             } else {
                 btnSpeak.setEnabled(true);
-<<<<<<< HEAD
                 speakOut();
-=======
-                speakOut(indice);
->>>>>>> origin/master
             }*/
 
         } else {
             Log.e("TTS", "Initilization Failed!");
         }
         speakOut(0);
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
     }
 
     private void speakOut(int i) {
@@ -193,18 +157,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         else if (jsonOutput.indexOf("repeat_step") != -1)
             repeat_step();
 
-<<<<<<< HEAD
-=======
-        jsonView.setText(jsonOutput);
-
-        if (jsonOutput.indexOf("next_step") != -1)
-            next_step();
-        else if (jsonOutput.indexOf("prev_step") != -1)
-            prev_step();
-        else if (jsonOutput.indexOf("repeat_step") != -1)
-            repeat_step();
-
->>>>>>> origin/master
         ((TextView) findViewById(R.id.txtText)).setText("Done!");
     }
 
