@@ -38,9 +38,9 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     private Button btnSpeak;
     protected Directions directions;
     List list = new ArrayList();
-    int indice = 0;
     double d = 0.7;
     float f = (float) d;
+    int indice = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,25 +57,20 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         String name = "item0";
         int count = 0;
         String temp = intent.getExtras().getString(name);
-        if (temp == null){
-            list.add("Senpai you did not enter a recipe");
-            speakOut(0);
-            list.remove(0);
-        }
-
         while (temp != null) {
             list.add(temp);
             count++;
             name = "item" + count;
             temp = intent.getExtras().getString(name);
         }
+        //((TextView) findViewById(R.id.txtText)).setText((String) list.get(0));
 
         // button on click event
         /*btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                speakOut(indice);
+                speakOut();
             }
 
         });*/
@@ -91,27 +86,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         super.onDestroy();
     }
 
-    public void next_step()
-    {
-        if (indice + 1 < this.list.size()) {
-            indice++;
-            speakOut(indice);
-        }
-    }
-    public void prev_step()
-    {
-        if (indice != 0 && indice < this.list.size()) {
-            indice--;
-            speakOut(indice);
-        }
-    }
-
-    public void repeat_step()
-    {
-        if (indice < this.list.size())
-            speakOut(indice);
-    }
-
     @Override
     public void onInit(int status) {
 
@@ -124,14 +98,13 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
                 Log.e("TTS", "This Language is not supported");
             } else {
                 btnSpeak.setEnabled(true);
-                speakOut(indice);
+                speakOut();
             }*/
 
         } else {
             Log.e("TTS", "Initilization Failed!");
         }
         speakOut(0);
-
     }
 
     private void speakOut(int i) {
@@ -152,11 +125,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -220,5 +188,24 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             return inflater.inflate(R.layout.wit_button, container, false);
         }
     }
+    public void next_step()
+    {
+        if (indice + 1 < this.list.size()) {
+            indice++;
+            speakOut(indice);
+        }
+    }
+    public void prev_step()
+    {
+        if (indice != 0 && indice < this.list.size()) {
+            indice--;
+            speakOut(indice);
+        }
+    }
 
+    public void repeat_step()
+    {
+        if (indice < this.list.size())
+            speakOut(indice);
+    }
 }
