@@ -51,7 +51,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         //_wit.enableContextLocation(getApplicationContext());
         tts = new TextToSpeech(this, this);
         tts.setSpeechRate(f);
-        btnSpeak = (Button) findViewById(R.id.butnSpeak);
+        //btnSpeak = (Button) findViewById(R.id.butnSpeak);
 
         Intent intent = getIntent();
         String name = "item0";
@@ -63,16 +63,17 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             name = "item" + count;
             temp = intent.getExtras().getString(name);
         }
+        //((TextView) findViewById(R.id.txtText)).setText((String) list.get(0));
 
         // button on click event
-        btnSpeak.setOnClickListener(new View.OnClickListener() {
+        /*btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 speakOut();
             }
 
-        });
+        });*/
     }
 
     @Override
@@ -92,23 +93,23 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
             int result = tts.setLanguage(Locale.US);
 
-            if (result == TextToSpeech.LANG_MISSING_DATA
+            /*if (result == TextToSpeech.LANG_MISSING_DATA
                     || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.e("TTS", "This Language is not supported");
             } else {
                 btnSpeak.setEnabled(true);
                 speakOut();
-            }
+            }*/
 
         } else {
             Log.e("TTS", "Initilization Failed!");
         }
-
+        speakOut(0);
     }
 
-    private void speakOut() {
+    private void speakOut(int i) {
         if(list.size() != 0)
-            tts.speak((String) list.get(0), TextToSpeech.QUEUE_FLUSH, null);
+            tts.speak((String) list.get(i), TextToSpeech.QUEUE_FLUSH, null);
     }
 
     @Override
@@ -124,11 +125,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -152,13 +148,15 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             return ;
         }
         String jsonOutput = gson.toJson(witOutcomes);
+        jsonView.setText(jsonOutput);
 
         if (jsonOutput.indexOf("next_step") != -1)
             next_step();
         else if (jsonOutput.indexOf("prev_step") != -1)
             prev_step();
+        else if (jsonOutput.indexOf("repeat_step") != -1)
+            repeat_step();
 
-        jsonView.setText(jsonOutput);
         ((TextView) findViewById(R.id.txtText)).setText("Done!");
     }
 
@@ -192,11 +190,22 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     }
     public void next_step()
     {
-        indice++;
+        if (indice + 1 < this.list.size()) {
+            indice++;
+            speakOut(indice);
+        }
     }
     public void prev_step()
     {
-        if (indice != 0)
+        if (indice != 0 && indice < this.list.size()) {
             indice--;
+            speakOut(indice);
+        }
+    }
+
+    public void repeat_step()
+    {
+        if (indice < this.list.size())
+            speakOut(indice);
     }
 }
