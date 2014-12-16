@@ -2,9 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.feastbeast.MainActivity"
-    android:background="@drawable/bg">
+    android:background="@drawable/bg"
+    tools:context="com.example.feastbeast.MainActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg"
+        />
     <ImageView
         android:layout_width="175dp"
         android:layout_height="175dp"
@@ -32,7 +37,8 @@
         android:id="@+id/edtURL"
         android:textColor="#333333"
         android:background="@drawable/recipe_input_box"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:hint="Enter URL"/>
 
     <Button
         android:layout_width="wrap_content"

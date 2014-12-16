@@ -20,12 +20,16 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
 
     private TextView respText;
     public Directions directions = new Directions();
+    public ArrayList<String> ingredients = new ArrayList<String>();
+    public String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +44,17 @@ public class MainActivity extends Activity {
         txt1.setTypeface(brandonGrotesque);
 
         respText = (TextView) findViewById(R.id.edtResp);
+        respText.setText("Only accepts valid recipes from food.com, foodnetwork.ca and allrecipes.com");
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-<<<<<<< HEAD
-                String siteUrl = edtUrl.getText().toString().toLowerCase();
-=======
                 String siteUrl = edtUrl.getText().toString();
->>>>>>> origin/master
                 if(siteUrl.trim().length() != 0) {
+                    directions = new Directions();
                     siteUrl.toLowerCase();
                     if (!(siteUrl.substring(0, Math.min(siteUrl.length(), 7)).equals("http://")))
                         siteUrl = "http://" + siteUrl;
-                    (new ParseURL()).execute(new String[]{siteUrl});
-                    if(directions.current != null)
-                        newRec(view);
+                    (new ParseURL(view)).execute(new String[]{siteUrl});
                     /*
                     else
                         onClick(view);
@@ -62,6 +62,11 @@ public class MainActivity extends Activity {
                 }
                 else
                     respText.setText("error, you need to enter a URL");
+
+                if(directions.current != null)
+                    newRec(view);
+                else
+                    respText.setText("Error, only accepts valid recipes from food.com, foodnetwork.ca and allrecipes.com");
             }
         });
     }
@@ -71,7 +76,8 @@ public class MainActivity extends Activity {
         //x.setText(directions.current.value);
         Intent intent = new Intent(this,NewRecipe.class);
         int count = 0;
-        String name = "item0";
+        String name = "recipe-directions";
+
         intent.putExtra(name,"Senpye you did not enter a recipe");
         while (directions.current != null)
         {
@@ -80,6 +86,11 @@ public class MainActivity extends Activity {
             name="item"+count;
             directions.current=directions.current.next;
         }
+        String[] strArrayHolder = new String[ingredients.size()];
+        strArrayHolder = ingredients.toArray(strArrayHolder);
+        intent.putExtra("ingredients",strArrayHolder);
+
+        intent.putExtra("title", title);
         startActivity(intent);
     }
 
@@ -147,6 +158,13 @@ public class MainActivity extends Activity {
     protected class ParseURL extends AsyncTask<String, Void, String> {
 
         String classFind = "li";
+        String ingredientsFind = "";
+
+        View view;
+
+        public ParseURL(View v){
+            this.view = v;
+        }
 
         @Override
         protected String doInBackground(String... strings) {
@@ -156,21 +174,26 @@ public class MainActivity extends Activity {
                 Document doc  = Jsoup.connect(strings[0]).get();
                 Log.d("JSwa", "Connected to ["+strings[0]+"]");
                 // Get document (HTML page) title
-                String title = doc.title();
-                Log.d("JSwA", "Title ["+title+"]");
-                buffer.append("Title: " + title + "\r\n");
+                title = doc.title();
+                //Log.d("JSwA", "Title ["+title+"]");
+                //buffer.append("Title: " + title + "\r\n");
 
-                if(strings[0].substring(0, Math.min(strings[0].length(), 26)).equals("http://www.foodnetwork.ca/"))
+                if(strings[0].substring(0, Math.min(strings[0].length(), 26)).equals("http://www.foodnetwork.ca/")) {
                     classFind = ".recipeInstructions p";
-                else if(strings[0].substring(0, Math.min(strings[0].length(), 22)).equals("http://allrecipes.com/"))
+                    ingredientsFind = ".recipe-ingredients p";
+                }
+                else if(strings[0].substring(0, Math.min(strings[0].length(), 22)).equals("http://allrecipes.com/")) {
                     classFind = ".directions li";
-                else if(strings[0].substring(0, Math.min(strings[0].length(), 20)).equals("http://www.food.com/"))
+                }
+                else if(strings[0].substring(0, Math.min(strings[0].length(), 20)).equals("http://www.food.com/")) {
                     classFind = ".instructions li";
+                }
                 else {
                     buffer.setLength(0);
                     buffer.append("Error only accepts recipes from http://www.foodnetwork.ca/, http://allrecipes.com/, http://www.food.com/");
                 }
 
+                //GET RECIPE
                 Elements topicList = doc.select(classFind);
                 if(!buffer.toString().equals("Error only accepts recipes from http://www.foodnetwork.ca/, http://allrecipes.com/, http://www.food.com/")){
                     buffer.append("Directions \r\n");
@@ -180,11 +203,23 @@ public class MainActivity extends Activity {
                           buffer.append(data + "\r\n");
                       }
                     }
+
+                // GET INGREDIENTS
+                buffer = new StringBuffer();
+                Elements ingredList = doc.select(ingredientsFind);
+                if(!buffer.toString().equals("Error only accepts recipes from http://www.foodnetwork.ca/, http://allrecipes.com/, http://www.food.com/")){
+                    buffer.append("Ingredients \r\n");
+                    for (Element ingredient : ingredList) {
+                        String data = ingredient.text();
+                        ingredients.add(data);
+                        buffer.append(data + "\r\n");
+                    }
+                }
             }
             catch(Throwable t) {
                 t.printStackTrace();
             }
-            return directions.current.value;
+            return buffer.toString();
         }
 
         @Override
@@ -196,6 +231,7 @@ public class MainActivity extends Activity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             respText.setText(s);
+            newRec(view);
         }
     }
 }

@@ -29,6 +29,7 @@ import ai.wit.sdk.model.WitOutcome;
 import com.example.feastbeast.MainActivity.Directions;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 
 public class NewRecipe extends ActionBarActivity implements IWitListener, TextToSpeech.OnInitListener {
@@ -42,6 +43,9 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     float f = (float) d;
     int indice = 0;
 
+    protected List ingredients;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +58,11 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         //btnSpeak = (Button) findViewById(R.id.butnSpeak);
 
         Intent intent = getIntent();
-        String name = "item0";
+        String name = "recipe-directions";
+
+        final TextView title = (TextView) findViewById(R.id.heading);
+        title.setText(intent.getExtras().getString("title"));
+
         int count = 0;
         String temp = intent.getExtras().getString(name);
         while (temp != null) {
@@ -63,7 +71,9 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             name = "item" + count;
             temp = intent.getExtras().getString(name);
         }
-        //((TextView) findViewById(R.id.txtText)).setText((String) list.get(0));
+
+        ingredients = Arrays.asList(intent.getExtras().getStringArray("ingredients"));
+        ((TextView) findViewById(R.id.txtText)).setText(list.toString());
 
         // button on click event
         /*btnSpeak.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +84,14 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             }
 
         });*/
+
+        final Button swap = (Button) findViewById(R.id.swap);
+        swap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((TextView) findViewById(R.id.txtText)).setText(ingredients.toString());
+            }
+        });
     }
 
     @Override
@@ -157,22 +175,22 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         else if (jsonOutput.indexOf("repeat_step") != -1)
             repeat_step();
 
-        ((TextView) findViewById(R.id.txtText)).setText("Done!");
+        //((TextView) findViewById(R.id.txtText)).setText("Done!");
     }
 
     @Override
     public void witDidStartListening() {
-        ((TextView) findViewById(R.id.txtText)).setText("Witting...");
+        //((TextView) findViewById(R.id.txtText)).setText("Witting...");
     }
 
     @Override
     public void witDidStopListening() {
-        ((TextView) findViewById(R.id.txtText)).setText("Processing...");
+        //((TextView) findViewById(R.id.txtText)).setText("Processing...");
     }
 
     @Override
     public void witActivityDetectorStarted() {
-        ((TextView) findViewById(R.id.txtText)).setText("Listening");
+        //((TextView) findViewById(R.id.txtText)).setText("Listening");
     }
 
     @Override
