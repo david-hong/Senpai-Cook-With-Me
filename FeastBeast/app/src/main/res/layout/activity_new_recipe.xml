@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:textStyle="bold"
+        android:textColor="#000000"
         android:id="@+id/heading"
         android:textSize="@dimen/titleSize"/>
 
@@ -25,35 +26,42 @@
         tools:layout="@layout/wit_button"
         />
 
-    <TextView
-        android:id="@+id/txtText"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+    <LinearLayout
         android:layout_width="match_parent"
+        android:id="@+id/buttons"
         android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
-        android:background="#ffffff"
-        android:text="The spoken text will show up here"
-        android:textColor="#000000" />
+        android:layout_below="@id/witButton">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="220dp"
-        android:text="The semantic results will show up here"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/jsonView"
-        android:background="#e4e4e4"
-        android:maxLines = "100"
-        android:scrollbars = "vertical"
-        />
+        <Button
+            android:text="SWAP!"
+            android:id="@+id/swap"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".50" />
 
-    <Button
-        android:layout_width="wrap_content"
+        <Button
+            android:text="right"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".50" />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/SCROLLER_ID"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/witButton"
-        android:layout_centerHorizontal="true"
-        android:text="SWAP!"
-        android:layout_marginTop="15dp"
-        android:id="@+id/swap"/>
+        android:scrollbars="vertical"
+        android:fillViewport="true"
+        android:layout_below="@+id/buttons">
+        <TextView
+            android:id="@+id/txtText"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:text="The spoken text will show up here"
+            android:textColor="#000000" />
+    </ScrollView>
 
 </RelativeLayout>

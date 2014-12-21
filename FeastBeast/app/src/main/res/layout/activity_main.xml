@@ -32,12 +32,10 @@
         android:layout_width="250dp"
         android:layout_height="45dp"
         android:layout_below="@id/txt1"
-        android:scrollHorizontally="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/edtURL"
         android:textColor="#333333"
         android:background="@drawable/recipe_input_box"
-        android:maxLines="1"
         android:hint="Enter URL"/>
 
     <Button

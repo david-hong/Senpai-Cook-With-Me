@@ -15,6 +15,7 @@ import android.speech.tts.TextToSpeech;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -31,6 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 
+import com.thalmic.myo.AbstractDeviceListener;
+import com.thalmic.myo.DeviceListener;
+import com.thalmic.myo.Hub;
+import com.thalmic.myo.Myo;
+import com.thalmic.myo.Pose;
+import com.thalmic.myo.scanner.ScanActivity;
+
 
 public class NewRecipe extends ActionBarActivity implements IWitListener, TextToSpeech.OnInitListener {
 
@@ -39,17 +47,99 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     private Button btnSpeak;
     protected Directions directions;
     List list = new ArrayList();
+    StringBuffer recipeStr = new StringBuffer();
+    protected List ingredients;
+    StringBuffer ingredientsStr = new StringBuffer();
     double d = 0.7;
     float f = (float) d;
     int indice = 0;
+    boolean recipe = true;
 
-    protected List ingredients;
+    private Toast mToast;
+    // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
+    // If you do not override an event, the default behavior is to do nothing.
+    private DeviceListener mListener = new AbstractDeviceListener() {
+        @Override
+        public void onConnect(Myo myo, long timestamp) {
+            showToast("Connected");
+        }
+        @Override
+        public void onDisconnect(Myo myo, long timestamp) {
+            showToast("Disconnected");
+        }
+        // onPose() is called whenever the Myo detects that the person wearing it has changed their pose, for example,
+        // making a fist, or not making a fist anymore.
+        @Override
+        public void onPose(Myo myo, long timestamp, Pose pose) {
+            // Handle the cases of the Pose enumeration, and change the text of the text view
+            // based on the pose we receive.
+            switch (pose) {
+                case UNKNOWN:
+                    showToast("Unknown");
+                    break;
+                case REST:
+                case DOUBLE_TAP:
+                    showToast("Double Tap");
+                    break;
+                case FIST:
+                    showToast("Fist");
+                    break;
+                case WAVE_IN:
+                    prev_step();
+                    showToast("Wave in");
+                    break;
+                case WAVE_OUT:
+                    next_step();
+                    showToast("Wave Out");
+                    break;
+                case FINGERS_SPREAD:
+                    repeat_step();
+                    showToast("Spread Fingers");
+                    break;
+            }
+            if (pose != Pose.UNKNOWN && pose != Pose.REST) {
+                // Tell the Myo to stay unlocked until told otherwise. We do that here so you can
+                // hold the poses without the Myo becoming locked.
+                myo.unlock(Myo.UnlockType.HOLD);
+                // Notify the Myo that the pose has resulted in an action, in this case changing
+                // the text on the screen. The Myo will vibrate.
+                myo.notifyUserAction();
+            } else {
+                // Tell the Myo to stay unlocked only for a short period. This allows the Myo to
+                // stay unlocked while poses are being performed, but lock after inactivity.
+                myo.unlock(Myo.UnlockType.TIMED);
+            }
+        }
+    };
 
+    private void showToast(String text) {
+        if (mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+        }
+        mToast.show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_recipe);
+
+        // First, we initialize the Hub singleton with an application identifier.
+        Hub hub = Hub.getInstance();
+        if (!hub.init(this, getPackageName())) {
+            showToast("Couldn't initialize Hub");
+            finish();
+            return;
+        }
+        // Disable standard Myo locking policy. All poses will be delivered.
+        //hub.setLockingPolicy(Hub.LockingPolicy.NONE);
+        // Next, register for DeviceListener callbacks.
+        hub.addListener(mListener);
+        // Finally, scan for Myo devices and connect to the first one found that is very near.
+        hub.attachToAdjacentMyo();
+
         String accessToken = "U55JDKGFF6CYR3XV64RJTTCX3OQZKL57";
         _wit = new Wit(accessToken, this);
         //_wit.enableContextLocation(getApplicationContext());
@@ -72,8 +162,22 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             temp = intent.getExtras().getString(name);
         }
 
+        //format recipeStr
+        for (int i = 0; i<list.size();i++){
+            recipeStr.append(list.get(i));
+            recipeStr.append("\n");
+            recipeStr.append("\n");
+        }
+
         ingredients = Arrays.asList(intent.getExtras().getStringArray("ingredients"));
-        ((TextView) findViewById(R.id.txtText)).setText(list.toString());
+
+        //format ingredientsStr
+        for (int i = 0; i<ingredients.size();i++){
+            ingredientsStr.append(ingredients.get(i));
+            ingredientsStr.append("\n");
+        }
+
+        ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
 
         // button on click event
         /*btnSpeak.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +193,14 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         swap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((TextView) findViewById(R.id.txtText)).setText(ingredients.toString());
+                if (recipe) {
+                    ((TextView) findViewById(R.id.txtText)).setText(ingredientsStr.toString());
+                    recipe = false;
+                }
+                else {
+                    ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
+                    recipe = true;
+                }
             }
         });
     }
@@ -102,6 +213,9 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             tts.shutdown();
         }
         super.onDestroy();
+
+        Hub.getInstance().removeListener(mListener);
+        Hub.getInstance().shutdown();
     }
 
     @Override
@@ -134,6 +248,10 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_new_recipe, menu);
+
+        MenuItem myoConnect = menu.findItem(R.id.myo_connect);
+        Intent intent = new Intent(this, ScanActivity.class);
+        myoConnect.setIntent(intent);
         return true;
     }
 
@@ -157,16 +275,16 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
     @Override
     public void witDidGraspIntent(ArrayList<WitOutcome> witOutcomes, String messageId, Error error) {
-        TextView jsonView = (TextView) findViewById(R.id.jsonView);
-        jsonView.setMovementMethod(new ScrollingMovementMethod());
+        //TextView jsonView = (TextView) findViewById(R.id.jsonView);
+        //jsonView.setMovementMethod(new ScrollingMovementMethod());
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         if (error != null) {
-            jsonView.setText(error.getLocalizedMessage());
+            //jsonView.setText(error.getLocalizedMessage());
             return ;
         }
         String jsonOutput = gson.toJson(witOutcomes);
-        jsonView.setText(jsonOutput);
+        //jsonView.setText(jsonOutput);
 
         if (jsonOutput.indexOf("next_step") != -1)
             next_step();
@@ -208,6 +326,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     }
     public void next_step()
     {
+        tts.stop();
         if (indice + 1 < this.list.size()) {
             indice++;
             speakOut(indice);
@@ -215,6 +334,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     }
     public void prev_step()
     {
+        tts.stop();
         if (indice != 0 && indice < this.list.size()) {
             indice--;
             speakOut(indice);
@@ -223,6 +343,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
     public void repeat_step()
     {
+        tts.stop();
         if (indice < this.list.size())
             speakOut(indice);
     }
