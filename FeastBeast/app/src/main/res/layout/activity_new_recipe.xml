@@ -1,9 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:layout_height="match_parent"
     tools:context="com.example.feastbeast.MainActivity"
     android:background="#ffffff">
 
@@ -33,17 +30,20 @@
         android:layout_below="@id/witButton">
 
         <Button
-            android:text="SWAP!"
-            android:id="@+id/swap"
+            android:text="Recipe"
+            android:id="@+id/recipeBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight=".50" />
+            android:layout_weight=".50"
+            android:background="#44b9cb"/>
 
         <Button
-            android:text="right"
+            android:text="Ingredients"
+            android:id="@+id/ingredientsBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight=".50" />
+            android:layout_weight=".50"
+            android:background="#2eaac0"/>
 
     </LinearLayout>
 
@@ -53,13 +53,18 @@
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
         android:fillViewport="true"
-        android:layout_below="@+id/buttons">
+        android:layout_below="@+id/buttons"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin">
         <TextView
             android:id="@+id/txtText"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#ffffff"
+            android:textSize="16dp"
             android:text="The spoken text will show up here"
             android:textColor="#000000" />
     </ScrollView>

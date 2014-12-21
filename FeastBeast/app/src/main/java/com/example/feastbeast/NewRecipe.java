@@ -1,7 +1,9 @@
 package com.example.feastbeast;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +40,9 @@ import com.thalmic.myo.Hub;
 import com.thalmic.myo.Myo;
 import com.thalmic.myo.Pose;
 import com.thalmic.myo.scanner.ScanActivity;
+import com.thalmic.myo.Quaternion;
+
+import android.media.AudioManager;
 
 
 public class NewRecipe extends ActionBarActivity implements IWitListener, TextToSpeech.OnInitListener {
@@ -54,6 +59,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     float f = (float) d;
     int indice = 0;
     boolean recipe = true;
+    boolean volumeMode = false;
 
     private Toast mToast;
     // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
@@ -75,24 +81,30 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             // based on the pose we receive.
             switch (pose) {
                 case UNKNOWN:
+                    volumeMode = false;
                     showToast("Unknown");
                     break;
                 case REST:
                 case DOUBLE_TAP:
+                    volumeMode = false;
                     showToast("Double Tap");
                     break;
                 case FIST:
+                    volumeMode = true;
                     showToast("Fist");
                     break;
                 case WAVE_IN:
+                    volumeMode = false;
                     prev_step();
                     showToast("Wave in");
                     break;
                 case WAVE_OUT:
+                    volumeMode = false;
                     next_step();
                     showToast("Wave Out");
                     break;
                 case FINGERS_SPREAD:
+                    volumeMode = false;
                     repeat_step();
                     showToast("Spread Fingers");
                     break;
@@ -108,6 +120,22 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
                 // Tell the Myo to stay unlocked only for a short period. This allows the Myo to
                 // stay unlocked while poses are being performed, but lock after inactivity.
                 myo.unlock(Myo.UnlockType.TIMED);
+            }
+        }
+
+        @Override
+        public void onOrientationData(Myo myo, long timestamp, Quaternion rotation) {
+            float roll = (float) Math.toDegrees(Quaternion.roll(rotation));
+            float pitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
+            float yaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
+
+            if(volumeMode){
+                showToast("roll");
+                AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+                int volume = Math.min((int)((roll + 60)*(10.0/80.0)), 10);
+                showToast(Integer.toString(volume));
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0); // 15 max, cap at 10/11
+                //-60 to 20
             }
         }
     };
@@ -189,17 +217,27 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
         });*/
 
-        final Button swap = (Button) findViewById(R.id.swap);
-        swap.setOnClickListener(new View.OnClickListener() {
+        final Button recipeBtn = (Button) findViewById(R.id.recipeBtn);
+        final Button ingredientsBtn = (Button) findViewById(R.id.ingredientsBtn);
+        recipeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!recipe) {
+                    ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
+                    recipe = true;
+                    recipeBtn.setBackgroundColor(Color.parseColor("#44b9cb"));
+                    ingredientsBtn.setBackgroundColor(Color.parseColor("#2eaac0"));
+                }
+            }
+        });
+        ingredientsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (recipe) {
                     ((TextView) findViewById(R.id.txtText)).setText(ingredientsStr.toString());
                     recipe = false;
-                }
-                else {
-                    ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
-                    recipe = true;
+                    recipeBtn.setBackgroundColor(Color.parseColor("#2eaac0"));
+                    ingredientsBtn.setBackgroundColor(Color.parseColor("#44b9cb"));
                 }
             }
         });
