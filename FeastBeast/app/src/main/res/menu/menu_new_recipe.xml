@@ -1,7 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context="com.example.feastbeast.MainActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.feastbeast.MainActivity">
+    <item android:id="@+id/bookmark"
+        android:icon="@drawable/fave"
+        android:title="Bookmark"
+        android:showAsAction="ifRoom" />
     <item android:id="@+id/myo_connect"
         android:title="Connect Myo"
         android:orderInCategory="100"/>
+    <item android:id="@+id/bookmarked"
+        android:title="Bookmarked"
+        android:orderInCategory="102"/>
+    <item android:id="@+id/newURL"
+        android:title="Parse new URL"
+        android:orderInCategory="103"/>
 </menu>

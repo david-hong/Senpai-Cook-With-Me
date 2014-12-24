@@ -1,0 +1,14 @@
+ {
+    "recpies": [
+    {
+      "name": "Linear Motion",
+      "recipe": ["1. blend sugar"],
+	  "ingredients": ["1/2 cup sugar", "blender"]
+    },
+    {
+      "name": "Quadratic Motion",
+      "recipe": ["1. blend dog"],
+	  "ingredients": ["Lees Wok", "Dog"]
+    }
+  ]
+}

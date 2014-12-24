@@ -3,7 +3,9 @@ package com.example.feastbeast;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,23 +45,28 @@ import com.thalmic.myo.scanner.ScanActivity;
 import com.thalmic.myo.Quaternion;
 
 import android.media.AudioManager;
+import com.google.gson.Gson;
 
 
 public class NewRecipe extends ActionBarActivity implements IWitListener, TextToSpeech.OnInitListener {
 
     Wit _wit;
     private TextToSpeech tts;
-    private Button btnSpeak;
-    protected Directions directions;
-    List list = new ArrayList();
+
+    String recipeName;
+    List<String> list = new ArrayList<String>();
     StringBuffer recipeStr = new StringBuffer();
-    protected List ingredients;
+    protected List<String> ingredients = new ArrayList<String>();
     StringBuffer ingredientsStr = new StringBuffer();
+    public List<Recipe> recipes = new ArrayList<Recipe>();
+    List<String> titles = new ArrayList<String>();
+
     double d = 0.7;
     float f = (float) d;
     int indice = 0;
     boolean recipe = true;
     boolean volumeMode = false;
+    boolean bookmarked = false;
 
     private Toast mToast;
     // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
@@ -154,6 +161,13 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_recipe);
 
+        //CHANGE ACTIONBAR COLORS
+        getActionBar().setBackgroundDrawable(new
+                ColorDrawable(Color.parseColor("#ffffff")));
+        int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
+        TextView titleText = (TextView)findViewById(titleId);
+        titleText.setTextColor(Color.parseColor("#000000"));
+
         // First, we initialize the Hub singleton with an application identifier.
         Hub hub = Hub.getInstance();
         if (!hub.init(this, getPackageName())) {
@@ -168,20 +182,21 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         // Finally, scan for Myo devices and connect to the first one found that is very near.
         hub.attachToAdjacentMyo();
 
+        //WIT AI STUFF
         String accessToken = "U55JDKGFF6CYR3XV64RJTTCX3OQZKL57";
         _wit = new Wit(accessToken, this);
-        //_wit.enableContextLocation(getApplicationContext());
         tts = new TextToSpeech(this, this);
         tts.setSpeechRate(f);
-        //btnSpeak = (Button) findViewById(R.id.butnSpeak);
 
+        //INTENT DATA
         Intent intent = getIntent();
-        String name = "recipe-directions";
 
         final TextView title = (TextView) findViewById(R.id.heading);
-        title.setText(intent.getExtras().getString("title"));
+        recipeName = intent.getExtras().getString("title");
+        title.setText(recipeName);
 
         int count = 0;
+        String name = "recipe-directions";
         String temp = intent.getExtras().getString(name);
         while (temp != null) {
             list.add(temp);
@@ -207,16 +222,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
         ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
 
-        // button on click event
-        /*btnSpeak.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                speakOut();
-            }
-
-        });*/
-
         final Button recipeBtn = (Button) findViewById(R.id.recipeBtn);
         final Button ingredientsBtn = (Button) findViewById(R.id.ingredientsBtn);
         recipeBtn.setOnClickListener(new View.OnClickListener() {
@@ -241,6 +246,29 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
                 }
             }
         });
+
+        //GET BOOKMARKED
+        Gson gs = new Gson();
+        int i = 0;
+        while(getIntent().getStringExtra("bookmarked"+i) != null) {
+            String gson = getIntent().getStringExtra("bookmarked"+i);
+            recipes.add(gs.fromJson(gson, Recipe.class));
+            i++;
+        }
+
+        //Check if current is bookmarked
+        for(int j = 0; j<recipes.size();j++){
+            titles.add(recipes.get(j).toString());
+        }
+
+        if(titles.contains(recipeName)) {
+            bookmarked = true;
+            //((TextView) findViewById(R.id.txtText)).setText("true");
+        }
+        else {
+            bookmarked = false;
+            //((TextView) findViewById(R.id.txtText)).setText("false");
+        }
     }
 
     @Override
@@ -260,21 +288,11 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
     public void onInit(int status) {
 
         if (status == TextToSpeech.SUCCESS) {
-
             int result = tts.setLanguage(Locale.US);
-
-            /*if (result == TextToSpeech.LANG_MISSING_DATA
-                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS", "This Language is not supported");
-            } else {
-                btnSpeak.setEnabled(true);
-                speakOut();
-            }*/
-
         } else {
             Log.e("TTS", "Initilization Failed!");
         }
-        speakOut(0);
+        //speakOut(0);
     }
 
     private void speakOut(int i) {
@@ -290,6 +308,56 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         MenuItem myoConnect = menu.findItem(R.id.myo_connect);
         Intent intent = new Intent(this, ScanActivity.class);
         myoConnect.setIntent(intent);
+
+        MenuItem bookmarkedItem = menu.findItem(R.id.bookmarked);
+        MenuItem newURL = menu.findItem(R.id.newURL);
+
+        Intent intent2 = new Intent(this, ListViewRemovalAnimation.class);
+        Intent intent4 = new Intent(this, MainActivity.class);
+
+        //BOOKMARKS
+        Gson gs = new Gson();
+        String bookmarks;
+        for(int i = 0; i<recipes.size();i++){
+            bookmarks = gs.toJson(recipes.get(i));
+            intent2.putExtra("bookmarked"+i, bookmarks);
+            intent4.putExtra("bookmarked" + i, bookmarks);
+        }
+
+        bookmarkedItem.setIntent(intent2);
+        newURL.setIntent(intent4);
+
+        //BOOKMAKRING OR UNBOOKMARKING
+        Intent intent3 = new Intent(this, NewRecipe.class);
+
+        MenuItem bookmark = menu.findItem(R.id.bookmark);
+        if(bookmarked) {
+            bookmark.setTitle("unbookmark");
+            recipes.remove(titles.indexOf(recipeName));
+        }
+        else {
+            Recipe recipeHolder = new Recipe(recipeName, list, ingredients);
+            recipes.add(recipeHolder);
+        }
+
+        intent3.putExtra("title", recipeName);
+
+        String[] strArrayHolder = new String[ingredients.size()];
+        strArrayHolder = ingredients.toArray(strArrayHolder);
+        intent3.putExtra("ingredients", strArrayHolder);
+
+        intent3.putExtra("recipe-directions", list.get(0));
+        for (int i = 1; i < list.size() + 1; i++) {
+            intent3.putExtra("item" + i, list.get(i - 1));
+        }
+
+        for (int i = 0; i < recipes.size(); i++) {
+            bookmarks = gs.toJson(recipes.get(i));
+            intent3.putExtra("bookmarked" + i, bookmarks);
+        }
+
+        bookmark.setIntent(intent3);
+
         return true;
     }
 

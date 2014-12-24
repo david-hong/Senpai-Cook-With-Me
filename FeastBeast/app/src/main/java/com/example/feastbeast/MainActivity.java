@@ -1,7 +1,10 @@
 package com.example.feastbeast;
 
 import android.app.Activity;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +25,7 @@ import org.jsoup.select.Elements;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
+import com.google.gson.Gson;
 
 
 public class MainActivity extends Activity {
@@ -30,11 +34,34 @@ public class MainActivity extends Activity {
     public Directions directions = new Directions();
     public ArrayList<String> ingredients = new ArrayList<String>();
     public String title;
+    public List<Recipe> recipes = new ArrayList<Recipe>();
+
+    // test
+    public ArrayList<String> j = new ArrayList<String>();
+    public Recipe r1;
+    public Recipe r2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //TEST
+        j.add("bob");
+        j.add("kawaii");
+        r1 = new Recipe("Ham", j, j);
+        r2 = new Recipe("Cute", j, j);
+        recipes.add(r1);
+        recipes.add(r2);
+
+        //CHANGE ACTIONBAR COLORS
+        getActionBar().setBackgroundDrawable(new
+                ColorDrawable(Color.parseColor("#ffffff")));
+        int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
+        TextView titleText = (TextView)findViewById(titleId);
+        titleText.setTextColor(Color.parseColor("#000000"));
+
+        //INITIALIZE FONTS
         Typeface brandonGrotesque = Typeface.createFromAsset(getAssets(), "fonts/Brandon_blk.otf");
 
         final EditText edtUrl = (EditText) findViewById(R.id.edtURL);
@@ -69,12 +96,23 @@ public class MainActivity extends Activity {
                     respText.setText("Error, only accepts valid recipes from food.com, foodnetwork.ca and allrecipes.com");
             }
         });
+
+        //GET BOOKMARKED --- COMMENT OUT RE INITIALIZING RECIPES WHEN DONE WITH TEST DATA @ TOP
+        if (getIntent().getStringExtra("bookmarked"+0) != null)
+            recipes = new ArrayList<Recipe>();
+        Gson gs = new Gson();
+        int i = 0;
+        while(getIntent().getStringExtra("bookmarked"+i) != null) {
+            String gson = getIntent().getStringExtra("bookmarked"+i);
+            recipes.add(gs.fromJson(gson, Recipe.class));
+            i++;
+        }
     }
 
     public void newRec(View view){
-        //EditText x = (EditText)findViewById(R.id.edtURL);
-        //x.setText(directions.current.value);
         Intent intent = new Intent(this,NewRecipe.class);
+        intent.putExtra("title", title);
+
         int count = 0;
         String name = "recipe-directions";
 
@@ -90,13 +128,33 @@ public class MainActivity extends Activity {
         strArrayHolder = ingredients.toArray(strArrayHolder);
         intent.putExtra("ingredients",strArrayHolder);
 
-        intent.putExtra("title", title);
+        Gson gs = new Gson();
+        String bookmarked;
+
+        for(int i = 0; i<recipes.size();i++){
+            bookmarked = gs.toJson(recipes.get(i));
+            intent.putExtra("bookmarked"+i, bookmarked);
+        }
+
         startActivity(intent);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        MenuItem bookmarked = menu.findItem(R.id.bookmarked);
+        Intent intent2 = new Intent(this, ListViewRemovalAnimation.class);
+
+        //BOOKMARKS
+        Gson gs = new Gson();
+        String bookmarks;
+        for(int i = 0; i<recipes.size();i++){
+            bookmarks = gs.toJson(recipes.get(i));
+            intent2.putExtra("bookmarked"+i, bookmarks);
+        }
+        bookmarked.setIntent(intent2);
+
         return true;
     }
 
@@ -175,8 +233,6 @@ public class MainActivity extends Activity {
                 Log.d("JSwa", "Connected to ["+strings[0]+"]");
                 // Get document (HTML page) title
                 title = doc.title();
-                //Log.d("JSwA", "Title ["+title+"]");
-                //buffer.append("Title: " + title + "\r\n");
 
                 if(strings[0].substring(0, Math.min(strings[0].length(), 26)).equals("http://www.foodnetwork.ca/")) {
                     classFind = ".recipeInstructions p";

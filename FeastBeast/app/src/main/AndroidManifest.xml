@@ -28,6 +28,10 @@
             android:name="com.example.feastbeast.NewRecipe"
             android:label="Recipe" >
         </activity>
+        <activity
+            android:name="com.example.feastbeast.ListViewRemovalAnimation"
+            android:label="Bookmarked" >
+        </activity>
     </application>
 
 </manifest>
