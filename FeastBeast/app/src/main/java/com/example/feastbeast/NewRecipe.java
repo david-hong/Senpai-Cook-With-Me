@@ -331,32 +331,36 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         Intent intent3 = new Intent(this, NewRecipe.class);
 
         MenuItem bookmark = menu.findItem(R.id.bookmark);
-        if(bookmarked) {
-            bookmark.setTitle("unbookmark");
-            recipes.remove(titles.indexOf(recipeName));
+        if(list.get(0).equals((String) "Senpye you did not enter a recipe")){
+            bookmark.setTitle("Invalid URL");
         }
         else {
-            Recipe recipeHolder = new Recipe(recipeName, list, ingredients);
-            recipes.add(recipeHolder);
+            if (bookmarked) {
+                bookmark.setTitle("unbookmark");
+                recipes.remove(titles.indexOf(recipeName));
+            } else {
+                Recipe recipeHolder = new Recipe(recipeName, list, ingredients);
+                recipes.add(recipeHolder);
+            }
+
+            intent3.putExtra("title", recipeName);
+
+            String[] strArrayHolder = new String[ingredients.size()];
+            strArrayHolder = ingredients.toArray(strArrayHolder);
+            intent3.putExtra("ingredients", strArrayHolder);
+
+            intent3.putExtra("recipe-directions", list.get(0));
+            for (int i = 1; i < list.size() + 1; i++) {
+                intent3.putExtra("item" + i, list.get(i - 1));
+            }
+
+            for (int i = 0; i < recipes.size(); i++) {
+                bookmarks = gs.toJson(recipes.get(i));
+                intent3.putExtra("bookmarked" + i, bookmarks);
+            }
+
+            bookmark.setIntent(intent3);
         }
-
-        intent3.putExtra("title", recipeName);
-
-        String[] strArrayHolder = new String[ingredients.size()];
-        strArrayHolder = ingredients.toArray(strArrayHolder);
-        intent3.putExtra("ingredients", strArrayHolder);
-
-        intent3.putExtra("recipe-directions", list.get(0));
-        for (int i = 1; i < list.size() + 1; i++) {
-            intent3.putExtra("item" + i, list.get(i - 1));
-        }
-
-        for (int i = 0; i < recipes.size(); i++) {
-            bookmarks = gs.toJson(recipes.get(i));
-            intent3.putExtra("bookmarked" + i, bookmarks);
-        }
-
-        bookmark.setIntent(intent3);
 
         return true;
     }

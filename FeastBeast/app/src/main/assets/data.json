@@ -1,5 +1,4 @@
- {
-    "recpies": [
+ [
     {
       "name": "Linear Motion",
       "recipe": ["1. blend sugar"],
@@ -11,4 +10,3 @@
 	  "ingredients": ["Lees Wok", "Dog"]
     }
   ]
-}

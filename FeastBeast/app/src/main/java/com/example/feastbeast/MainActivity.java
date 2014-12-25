@@ -1,12 +1,14 @@
 package com.example.feastbeast;
 
 import android.app.Activity;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import com.google.gson.stream.JsonReader;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +24,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
@@ -46,17 +51,19 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //TEST
-        j.add("bob");
-        j.add("kawaii");
-        r1 = new Recipe("Ham", j, j);
-        r2 = new Recipe("Cute", j, j);
-        recipes.add(r1);
-        recipes.add(r2);
+        respText = (TextView) findViewById(R.id.edtResp);
+
+        //LOAD RECIPES FROM JSON FILE
+        recipes = new ArrayList<Recipe>();
+        try {
+            openFile("data.json");
+        }
+        catch(Exception e){
+            //file not found? RIP
+        }
 
         //CHANGE ACTIONBAR COLORS
-        getActionBar().setBackgroundDrawable(new
-                ColorDrawable(Color.parseColor("#ffffff")));
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
         int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
         TextView titleText = (TextView)findViewById(titleId);
         titleText.setTextColor(Color.parseColor("#000000"));
@@ -70,7 +77,6 @@ public class MainActivity extends Activity {
         btnGo.setTypeface(brandonGrotesque);
         txt1.setTypeface(brandonGrotesque);
 
-        respText = (TextView) findViewById(R.id.edtResp);
         respText.setText("Only accepts valid recipes from food.com, foodnetwork.ca and allrecipes.com");
         btnGo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +103,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        //GET BOOKMARKED --- COMMENT OUT RE INITIALIZING RECIPES WHEN DONE WITH TEST DATA @ TOP
+        //GET BOOKMARKED
         if (getIntent().getStringExtra("bookmarked"+0) != null)
             recipes = new ArrayList<Recipe>();
         Gson gs = new Gson();
@@ -109,6 +115,26 @@ public class MainActivity extends Activity {
         }
     }
 
+    public void openFile(String fileName) throws java.io.IOException{
+        InputStream input = getAssets().open(fileName);
+        readJsonStream(input);
+    }
+
+    public void readJsonStream(InputStream in) throws IOException {
+        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+        reader.beginArray();
+        Gson gs = new Gson();
+        while (reader.hasNext()) {
+            respText.setText("read");
+            Recipe recip = gs.fromJson(reader, Recipe.class);
+            recipes.add(recip);
+        }
+        reader.endArray();
+        reader.close();
+        return;
+    }
+
+    //LOAD NEWRECIPE ACTIVITY
     public void newRec(View view){
         Intent intent = new Intent(this,NewRecipe.class);
         intent.putExtra("title", title);
