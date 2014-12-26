@@ -1,6 +1,7 @@
 package com.example.feastbeast;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -18,19 +19,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.content.Intent;
+import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonWriter;
 
 
 public class MainActivity extends Activity {
@@ -41,10 +47,8 @@ public class MainActivity extends Activity {
     public String title;
     public List<Recipe> recipes = new ArrayList<Recipe>();
 
-    // test
-    public ArrayList<String> j = new ArrayList<String>();
-    public Recipe r1;
-    public Recipe r2;
+    //TEST
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +57,15 @@ public class MainActivity extends Activity {
 
         respText = (TextView) findViewById(R.id.edtResp);
 
-        //LOAD RECIPES FROM JSON FILE
+        //LOAD RECIPES FROM JSON FILE ONLY IF MAINACTIVITY NOT LOADED ALREADY....
         recipes = new ArrayList<Recipe>();
-        try {
-            openFile("data.json");
-        }
-        catch(Exception e){
-            //file not found? RIP
+        if(! getIntent().getBooleanExtra("opened", false)) {
+            try {
+                openFile("data");
+            }
+            catch(Exception e){
+                //file not found? RIP
+            }
         }
 
         //CHANGE ACTIONBAR COLORS
@@ -88,10 +94,6 @@ public class MainActivity extends Activity {
                     if (!(siteUrl.substring(0, Math.min(siteUrl.length(), 7)).equals("http://")))
                         siteUrl = "http://" + siteUrl;
                     (new ParseURL(view)).execute(new String[]{siteUrl});
-                    /*
-                    else
-                        onClick(view);
-                     */
                 }
                 else
                     respText.setText("error, you need to enter a URL");
@@ -103,7 +105,41 @@ public class MainActivity extends Activity {
             }
         });
 
-        //GET BOOKMARKED
+        //TEST
+        final Button save = (Button) findViewById(R.id.save);
+        final Button load = (Button) findViewById(R.id.load);
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    FileOutputStream output = getApplicationContext().openFileOutput("data", Context.MODE_PRIVATE);
+                    writeJsonStream(output, recipes);
+                    output.close();
+                }
+                catch(Exception e){
+                }
+            }
+        });
+
+        load.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    openFile("data");
+                }
+                catch(Exception e){
+                    //file not found? RIP
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        //GET BOOKMARKED FROM INTENT -- MOVE TO ONRESUME()
         if (getIntent().getStringExtra("bookmarked"+0) != null)
             recipes = new ArrayList<Recipe>();
         Gson gs = new Gson();
@@ -115,9 +151,24 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onStop(){
+        try {
+            FileOutputStream output = getApplicationContext().openFileOutput("data", Context.MODE_PRIVATE);
+            writeJsonStream(output, recipes);
+            output.close();
+        }
+        catch(Exception e){
+        }
+
+        super.onStop();
+    }
+
     public void openFile(String fileName) throws java.io.IOException{
-        InputStream input = getAssets().open(fileName);
+        //InputStream input = getAssets().open(fileName);
+        InputStream input = openFileInput(fileName);
         readJsonStream(input);
+        input.close();
     }
 
     public void readJsonStream(InputStream in) throws IOException {
@@ -125,13 +176,36 @@ public class MainActivity extends Activity {
         reader.beginArray();
         Gson gs = new Gson();
         while (reader.hasNext()) {
-            respText.setText("read");
             Recipe recip = gs.fromJson(reader, Recipe.class);
             recipes.add(recip);
         }
         reader.endArray();
         reader.close();
         return;
+    }
+
+    public void writeJsonStream(OutputStream out, List<Recipe> messages) throws IOException {
+        showToast("Valid output stream");
+        Gson gs = new Gson();
+        JsonWriter writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
+        writer.setIndent("  ");
+        showToast("Trying Saving");
+        writer.beginArray();
+        showToast("Saving");
+        for (Recipe message : messages) {
+            gs.toJson(message, Recipe.class, writer);
+        }
+        writer.endArray();
+        writer.close();
+    }
+
+    private void showToast(String text) {
+        if (mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+        }
+        mToast.show();
     }
 
     //LOAD NEWRECIPE ACTIVITY

@@ -325,6 +325,8 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         }
 
         bookmarkedItem.setIntent(intent2);
+
+        intent4.putExtra("opened", true);
         newURL.setIntent(intent4);
 
         //BOOKMAKRING OR UNBOOKMARKING

@@ -108,6 +108,7 @@ public class ListViewRemovalAnimation extends Activity {
             bookmarks = gs.toJson(recipes.get(i));
             intent2.putExtra("bookmarked"+i, bookmarks);
         }
+        intent2.putExtra("opened", true);
 
         newURL.setIntent(intent2);
 
