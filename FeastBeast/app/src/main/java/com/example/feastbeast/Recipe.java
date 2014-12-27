@@ -8,10 +8,10 @@ import java.util.ArrayList;
  */
 public class Recipe {
     String name;
-    List ingredints;
-    List recipe;
+    List<String> ingredints;
+    List<String> recipe;
 
-    public Recipe(String n, List ingred, List recip){
+    public Recipe(String n, List<String> ingred, List<String> recip){
         this.name = n;
         this.ingredints = ingred;
         this.recipe = recip;

@@ -24,7 +24,10 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -36,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 
+import com.google.gson.stream.JsonWriter;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.DeviceListener;
 import com.thalmic.myo.Hub;
@@ -269,6 +273,31 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             bookmarked = false;
             //((TextView) findViewById(R.id.txtText)).setText("false");
         }
+    }
+
+    @Override
+    protected void onStop(){
+        try {
+            FileOutputStream output = getApplicationContext().openFileOutput("data", Context.MODE_PRIVATE);
+            writeJsonStream(output, recipes);
+            output.close();
+        }
+        catch(Exception e){
+        }
+
+        super.onStop();
+    }
+
+    public void writeJsonStream(OutputStream out, List<Recipe> messages) throws IOException {
+        Gson gs = new Gson();
+        JsonWriter writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
+        writer.setIndent("  ");
+        writer.beginArray();
+        for (Recipe message : messages) {
+            gs.toJson(message, Recipe.class, writer);
+        }
+        writer.endArray();
+        writer.close();
     }
 
     @Override

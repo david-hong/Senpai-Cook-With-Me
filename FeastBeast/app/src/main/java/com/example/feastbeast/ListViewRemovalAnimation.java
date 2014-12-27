@@ -16,11 +16,16 @@
 
 package com.example.feastbeast;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -34,8 +39,10 @@ import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonWriter;
 import com.thalmic.myo.scanner.ScanActivity;
 
 /**
@@ -59,6 +66,8 @@ public class ListViewRemovalAnimation extends Activity {
 
     private static final int SWIPE_DURATION = 250;
     private static final int MOVE_DURATION = 150;
+
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +100,31 @@ public class ListViewRemovalAnimation extends Activity {
         mAdapter = new StableArrayAdapter(this,R.layout.opaque_text_view, cheeseList,
                 mTouchListener);
         mListView.setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onStop(){
+        try {
+            FileOutputStream output = getApplicationContext().openFileOutput("data", Context.MODE_PRIVATE);
+            writeJsonStream(output, recipes);
+            output.close();
+        }
+        catch(Exception e){
+        }
+
+        super.onStop();
+    }
+
+    public void writeJsonStream(OutputStream out, List<Recipe> messages) throws IOException {
+        Gson gs = new Gson();
+        JsonWriter writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
+        writer.setIndent("  ");
+        writer.beginArray();
+        for (Recipe message : messages) {
+            gs.toJson(message, Recipe.class, writer);
+        }
+        writer.endArray();
+        writer.close();
     }
 
     @Override
@@ -220,6 +254,10 @@ public class ListViewRemovalAnimation extends Activity {
                                     }
                                 });
                     }
+                    else {
+                        showToast("tapping");
+                        openRecipe(mListView, v);
+                    }
                 }
                 mItemPressed = false;
                 break;
@@ -229,6 +267,41 @@ public class ListViewRemovalAnimation extends Activity {
             return true;
         }
     };
+
+    public void openRecipe(ListView listview, View recipeView){
+        int firstVisiblePosition = listview.getFirstVisiblePosition();
+        for (int i = 0; i < listview.getChildCount(); ++i) {
+            View child = listview.getChildAt(i);
+            if (child != recipeView) {
+                int position = firstVisiblePosition + i;
+                long itemId = mAdapter.getItemId(position);
+                mItemIdTopMap.put(itemId, child.getTop());
+            }
+        }
+        int position = mListView.getPositionForView(recipeView);
+
+        showToast("this far1");
+
+        Intent intent = new Intent(this, NewRecipe.class);
+        intent.putExtra("title", recipes.get(position).toString());
+        showToast("this far2");
+        intent.putExtra("recipe-directions", recipes.get(position).recipe.get(0));
+        showToast("this far3");
+        for(int i = 1; i < recipes.get(position).recipe.size() + 1;i++){
+                intent.putExtra("item"+i, recipes.get(position).recipe.get(i-1));
+        }
+        showToast("this far4");
+
+        Gson gs = new Gson();
+        String bookmarks;
+        for (int i = 0; i < recipes.size(); i++) {
+            bookmarks = gs.toJson(recipes.get(i));
+            intent.putExtra("bookmarked" + i, bookmarks);
+        }
+        showToast("this far5");
+
+        startActivity(intent);
+    }
 
     /**
      * This method animates all other views in the ListView container (not including ignoreView)
@@ -250,6 +323,7 @@ public class ListViewRemovalAnimation extends Activity {
         // Delete the item from the adapter
         int position = mListView.getPositionForView(viewToRemove);
         mAdapter.remove(mAdapter.getItem(position));
+        recipes.remove(position);
 
         final ViewTreeObserver observer = listview.getViewTreeObserver();
         observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -304,6 +378,16 @@ public class ListViewRemovalAnimation extends Activity {
                 return true;
             }
         });
+        //refresh activity so recipes intent is updated? probably not if im going to use buttons, but might have to here. FOR LATER.
+    }
+
+    private void showToast(String text) {
+        if (mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+        }
+        mToast.show();
     }
 
 }

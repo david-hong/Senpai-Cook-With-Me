@@ -47,7 +47,6 @@ public class MainActivity extends Activity {
     public String title;
     public List<Recipe> recipes = new ArrayList<Recipe>();
 
-    //TEST
     private Toast mToast;
 
     @Override
@@ -62,6 +61,7 @@ public class MainActivity extends Activity {
         if(! getIntent().getBooleanExtra("opened", false)) {
             try {
                 openFile("data");
+                showToast("opened");
             }
             catch(Exception e){
                 //file not found? RIP
@@ -104,35 +104,6 @@ public class MainActivity extends Activity {
                     respText.setText("Error, only accepts valid recipes from food.com, foodnetwork.ca and allrecipes.com");
             }
         });
-
-        //TEST
-        final Button save = (Button) findViewById(R.id.save);
-        final Button load = (Button) findViewById(R.id.load);
-
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    FileOutputStream output = getApplicationContext().openFileOutput("data", Context.MODE_PRIVATE);
-                    writeJsonStream(output, recipes);
-                    output.close();
-                }
-                catch(Exception e){
-                }
-            }
-        });
-
-        load.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    openFile("data");
-                }
-                catch(Exception e){
-                    //file not found? RIP
-                }
-            }
-        });
     }
 
     @Override
@@ -164,6 +135,15 @@ public class MainActivity extends Activity {
         super.onStop();
     }
 
+    private void showToast(String text) {
+        if (mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+        }
+        mToast.show();
+    }
+
     public void openFile(String fileName) throws java.io.IOException{
         //InputStream input = getAssets().open(fileName);
         InputStream input = openFileInput(fileName);
@@ -185,27 +165,15 @@ public class MainActivity extends Activity {
     }
 
     public void writeJsonStream(OutputStream out, List<Recipe> messages) throws IOException {
-        showToast("Valid output stream");
         Gson gs = new Gson();
         JsonWriter writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
         writer.setIndent("  ");
-        showToast("Trying Saving");
         writer.beginArray();
-        showToast("Saving");
         for (Recipe message : messages) {
             gs.toJson(message, Recipe.class, writer);
         }
         writer.endArray();
         writer.close();
-    }
-
-    private void showToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-        }
-        mToast.show();
     }
 
     //LOAD NEWRECIPE ACTIVITY
