@@ -37,13 +37,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
-import com.thalmic.myo.scanner.ScanActivity;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * This example shows how to use a swipe effect to remove items from a ListView,
@@ -100,6 +102,26 @@ public class ListViewRemovalAnimation extends Activity {
         mAdapter = new StableArrayAdapter(this,R.layout.opaque_text_view, cheeseList,
                 mTouchListener);
         mListView.setAdapter(mAdapter);
+
+        mListView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent intent = new Intent(ListViewRemovalAnimation.this, NewRecipe.class);
+                intent.putExtra("title", recipes.get(position).toString());
+                intent.putExtra("recipe-directions", recipes.get(position).recipe.get(0));
+                for(int i = 1; i < recipes.get(position).recipe.size() + 1;i++){
+                    intent.putExtra("item"+i, recipes.get(position).recipe.get(i-1));
+                }
+
+                Gson gs = new Gson();
+                String bookmarks;
+                for (int i = 0; i < recipes.size(); i++) {
+                    bookmarks = gs.toJson(recipes.get(i));
+                    intent.putExtra("bookmarked" + i, bookmarks);
+                }
+                ListViewRemovalAnimation.this.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -256,7 +278,11 @@ public class ListViewRemovalAnimation extends Activity {
                     }
                     else {
                         showToast("tapping");
-                        openRecipe(mListView, v);
+                        //openRecipe(mListView, v);
+                        int position = mListView.pointToPosition((int) event.getX(), (int) event.getY());
+                        if(position!=ListView.INVALID_POSITION){
+                            mListView.performItemClick(mListView.getChildAt(position- mListView.getFirstVisiblePosition()), position, mListView.getItemIdAtPosition(position));
+                        }
                     }
                 }
                 mItemPressed = false;
@@ -268,7 +294,7 @@ public class ListViewRemovalAnimation extends Activity {
         }
     };
 
-    public void openRecipe(ListView listview, View recipeView){
+    /*public void openRecipe(ListView listview, View recipeView){
         int firstVisiblePosition = listview.getFirstVisiblePosition();
         for (int i = 0; i < listview.getChildCount(); ++i) {
             View child = listview.getChildAt(i);
@@ -281,8 +307,7 @@ public class ListViewRemovalAnimation extends Activity {
         int position = mListView.getPositionForView(recipeView);
 
         showToast("this far1");
-
-        Intent intent = new Intent(this, NewRecipe.class);
+        Intent intent = new Intent(recipeView.getContext(), NewRecipe.class);
         intent.putExtra("title", recipes.get(position).toString());
         showToast("this far2");
         intent.putExtra("recipe-directions", recipes.get(position).recipe.get(0));
@@ -300,8 +325,8 @@ public class ListViewRemovalAnimation extends Activity {
         }
         showToast("this far5");
 
-        startActivity(intent);
-    }
+        recipeView.getContext().startActivity(intent);
+    }*/
 
     /**
      * This method animates all other views in the ListView container (not including ignoreView)
