@@ -404,38 +404,8 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             bookmark.setTitle("Invalid URL");
         }
         else if (list!= null) {
-            if (bookmarked) {
+            if (bookmarked)
                 bookmark.setTitle("unbookmark");
-                recipes.remove(titles.indexOf(recipeName));
-            } else {
-                Recipe recipeHolder = new Recipe(recipeName, ingredients, list);
-                recipes.add(recipeHolder);
-            }
-
-            intent3.putExtra("title", recipeName);
-
-            if(ingredients != null) {
-                String[] strArrayHolder = new String[ingredients.size()];
-                strArrayHolder = ingredients.toArray(strArrayHolder);
-                intent3.putExtra("ingredients", strArrayHolder);
-            }
-
-            if(list != null) {
-                intent3.putExtra("recipe-directions", list.get(0));
-                for (int i = 1; i < list.size(); i++) {
-                    intent3.putExtra("item" + i, list.get(i));
-                }
-            }
-
-            if(recipes != null) {
-                for (int i = 0; i < recipes.size(); i++) {
-                    bookmarks = gs.toJson(recipes.get(i));
-                    intent3.putExtra("bookmarked" + i, bookmarks);
-                }
-                showToast("rip" + recipes.size());
-            }
-
-            bookmark.setIntent(intent3);
         }
 
         return true;
@@ -448,7 +418,33 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        switch (id){
+            case R.id.bookmark:
+                if(bookmarked) {
+                    unbookmark();
+                    item.setTitle("Bookmark");
+                    bookmarked = false;
+                }
+                else {
+                    bookmark();
+                    item.setTitle("Unbookmark");
+                    bookmarked = true;
+                }
+                return true;
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void bookmark(){
+        Recipe recipeHolder = new Recipe(recipeName, ingredients, list);
+        recipes.add(recipeHolder);
+        titles.add(recipeName);
+    }
+
+    protected void unbookmark(){
+        recipes.remove(titles.indexOf(recipeName));
+        titles.remove(recipeName);
     }
 
     public void toggle(View v) {

@@ -110,8 +110,8 @@ public class ListViewRemovalAnimation extends Activity {
                 Intent intent3 = new Intent(ListViewRemovalAnimation.this,NewRecipe.class);
                 intent3.putExtra("title", recipes.get(position).toString());
                 intent3.putExtra("recipe-directions", recipes.get(position).recipe.get(0));
-                for(int i = 1; i < recipes.get(position).recipe.size() + 1;i++){
-                    intent3.putExtra("item"+i, recipes.get(position).recipe.get(i-1));
+                for(int i = 1; i < recipes.get(position).recipe.size();i++){
+                    intent3.putExtra("item"+i, recipes.get(position).recipe.get(i));
                 }
 
                 String[] strArrayHolder = new String[recipes.get(position).ingredints.size()];
