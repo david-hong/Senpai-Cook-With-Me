@@ -9,10 +9,4 @@
     <item android:id="@+id/myo_connect"
         android:title="Connect Myo"
         android:orderInCategory="100"/>
-    <item android:id="@+id/bookmarked"
-        android:title="Bookmarked"
-        android:orderInCategory="102"/>
-    <item android:id="@+id/newURL"
-        android:title="Parse new URL"
-        android:orderInCategory="103"/>
 </menu>

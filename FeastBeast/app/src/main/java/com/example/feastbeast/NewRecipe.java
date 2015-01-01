@@ -197,7 +197,8 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
         final TextView title = (TextView) findViewById(R.id.heading);
         recipeName = intent.getExtras().getString("title");
-        title.setText(recipeName);
+        if(!recipeName.isEmpty())
+            title.setText(recipeName);
 
         int count = 0;
         String name = "recipe-directions";
@@ -210,21 +211,28 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         }
 
         //format recipeStr
-        for (int i = 0; i<list.size();i++){
-            recipeStr.append(list.get(i));
-            recipeStr.append("\n");
-            recipeStr.append("\n");
+        if(list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                recipeStr.append(list.get(i));
+                recipeStr.append("\n");
+                recipeStr.append("\n");
+            }
         }
 
-        ingredients = Arrays.asList(intent.getExtras().getStringArray("ingredients"));
+        if(intent.getExtras().getStringArray("ingredients") != null)
+            ingredients = Arrays.asList(intent.getExtras().getStringArray("ingredients"));
 
         //format ingredientsStr
-        for (int i = 0; i<ingredients.size();i++){
-            ingredientsStr.append(ingredients.get(i));
-            ingredientsStr.append("\n");
+        if(ingredients != null) {
+            for (int i = 0; i < ingredients.size(); i++) {
+                ingredientsStr.append(ingredients.get(i));
+                ingredientsStr.append("\n");
+                ingredientsStr.append("\n");
+            }
         }
 
-        ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
+        if(!recipeStr.toString().isEmpty())
+            ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
 
         final Button recipeBtn = (Button) findViewById(R.id.recipeBtn);
         final Button ingredientsBtn = (Button) findViewById(R.id.ingredientsBtn);
@@ -232,7 +240,8 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             @Override
             public void onClick(View view) {
                 if (!recipe) {
-                    ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
+                    if(!recipeStr.toString().isEmpty())
+                        ((TextView) findViewById(R.id.txtText)).setText(recipeStr.toString());
                     recipe = true;
                     recipeBtn.setBackgroundColor(Color.parseColor("#44b9cb"));
                     ingredientsBtn.setBackgroundColor(Color.parseColor("#2eaac0"));
@@ -243,7 +252,8 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             @Override
             public void onClick(View view) {
                 if (recipe) {
-                    ((TextView) findViewById(R.id.txtText)).setText(ingredientsStr.toString());
+                    if(!ingredientsStr.toString().isEmpty())
+                        ((TextView) findViewById(R.id.txtText)).setText(ingredientsStr.toString());
                     recipe = false;
                     recipeBtn.setBackgroundColor(Color.parseColor("#2eaac0"));
                     ingredientsBtn.setBackgroundColor(Color.parseColor("#44b9cb"));
@@ -267,12 +277,55 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
         if(titles.contains(recipeName)) {
             bookmarked = true;
-            //((TextView) findViewById(R.id.txtText)).setText("true");
         }
         else {
             bookmarked = false;
-            //((TextView) findViewById(R.id.txtText)).setText("false");
         }
+
+        final Button newRecipe = (Button) findViewById(R.id.newRecip);
+        final Button create = (Button) findViewById(R.id.create);
+        final Button bookmarks = (Button) findViewById(R.id.bookmarks);
+
+        newRecipe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent mainAct = new Intent(NewRecipe.this, MainActivity.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                mainAct.putExtra("opened", true);
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    mainAct.putExtra("bookmarked"+j, bookmarkss);
+                }
+                startActivity(mainAct);
+            }
+        });
+        create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent createAct = new Intent(NewRecipe.this,NewRecipe.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    createAct.putExtra("bookmarked" + j, bookmarkss);
+                }
+                startActivity(createAct);
+            }
+        });
+        bookmarks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent bookmarkAct = new Intent(NewRecipe.this, ListViewRemovalAnimation.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    bookmarkAct.putExtra("bookmarked" + j, bookmarkss);
+                }
+                startActivity(bookmarkAct);
+            }
+        });
     }
 
     @Override
@@ -334,60 +387,52 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_new_recipe, menu);
 
+
         MenuItem myoConnect = menu.findItem(R.id.myo_connect);
         Intent intent = new Intent(this, ScanActivity.class);
         myoConnect.setIntent(intent);
 
-        MenuItem bookmarkedItem = menu.findItem(R.id.bookmarked);
-        MenuItem newURL = menu.findItem(R.id.newURL);
-
-        Intent intent2 = new Intent(this, ListViewRemovalAnimation.class);
-        Intent intent4 = new Intent(this, MainActivity.class);
-
         //BOOKMARKS
         Gson gs = new Gson();
         String bookmarks;
-        for(int i = 0; i<recipes.size();i++){
-            bookmarks = gs.toJson(recipes.get(i));
-            intent2.putExtra("bookmarked"+i, bookmarks);
-            intent4.putExtra("bookmarked" + i, bookmarks);
-        }
-
-        bookmarkedItem.setIntent(intent2);
-
-        intent4.putExtra("opened", true);
-        newURL.setIntent(intent4);
 
         //BOOKMAKRING OR UNBOOKMARKING
         Intent intent3 = new Intent(this, NewRecipe.class);
 
         MenuItem bookmark = menu.findItem(R.id.bookmark);
-        if(list.get(0).equals((String) "Senpye you did not enter a recipe")){
+        if(list != null && list.get(0).equals((String) "Senpye you did not enter a recipe")){
             bookmark.setTitle("Invalid URL");
         }
-        else {
+        else if (list!= null) {
             if (bookmarked) {
                 bookmark.setTitle("unbookmark");
                 recipes.remove(titles.indexOf(recipeName));
             } else {
-                Recipe recipeHolder = new Recipe(recipeName, list, ingredients);
+                Recipe recipeHolder = new Recipe(recipeName, ingredients, list);
                 recipes.add(recipeHolder);
             }
 
             intent3.putExtra("title", recipeName);
 
-            String[] strArrayHolder = new String[ingredients.size()];
-            strArrayHolder = ingredients.toArray(strArrayHolder);
-            intent3.putExtra("ingredients", strArrayHolder);
-
-            intent3.putExtra("recipe-directions", list.get(0));
-            for (int i = 1; i < list.size() + 1; i++) {
-                intent3.putExtra("item" + i, list.get(i - 1));
+            if(ingredients != null) {
+                String[] strArrayHolder = new String[ingredients.size()];
+                strArrayHolder = ingredients.toArray(strArrayHolder);
+                intent3.putExtra("ingredients", strArrayHolder);
             }
 
-            for (int i = 0; i < recipes.size(); i++) {
-                bookmarks = gs.toJson(recipes.get(i));
-                intent3.putExtra("bookmarked" + i, bookmarks);
+            if(list != null) {
+                intent3.putExtra("recipe-directions", list.get(0));
+                for (int i = 1; i < list.size(); i++) {
+                    intent3.putExtra("item" + i, list.get(i));
+                }
+            }
+
+            if(recipes != null) {
+                for (int i = 0; i < recipes.size(); i++) {
+                    bookmarks = gs.toJson(recipes.get(i));
+                    intent3.putExtra("bookmarked" + i, bookmarks);
+                }
+                showToast("rip" + recipes.size());
             }
 
             bookmark.setIntent(intent3);
@@ -425,7 +470,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             return ;
         }
         String jsonOutput = gson.toJson(witOutcomes);
-        //jsonView.setText(jsonOutput);
 
         if (jsonOutput.indexOf("next_step") != -1)
             next_step();
@@ -433,8 +477,6 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             prev_step();
         else if (jsonOutput.indexOf("repeat_step") != -1)
             repeat_step();
-
-        //((TextView) findViewById(R.id.txtText)).setText("Done!");
     }
 
     @Override

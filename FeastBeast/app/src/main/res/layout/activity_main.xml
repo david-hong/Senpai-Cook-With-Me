@@ -5,12 +5,39 @@
     android:background="@drawable/bg2"
     tools:context="com.example.feastbeast.MainActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/buttons"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="New Recipe"
+            android:id="@+id/newRecip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+        <Button
+            android:text="Create"
+            android:id="@+id/create"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+        <Button
+            android:text="Bookmarks"
+            android:id="@+id/bookmarks"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+    </LinearLayout>
+
     <ImageView
         android:layout_width="175dp"
         android:layout_height="175dp"
         android:background="@drawable/logo"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="65dp"
         android:id="@+id/logo"/>
 
     <TextView android:id="@+id/txt1"
@@ -42,15 +69,6 @@
         android:layout_marginTop="15dp"
         android:id="@+id/btnNewRecipe"/>
 
-    <TextView
-        android:id="@+id/edtResp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:lines="6"
-        android:layout_marginTop="10dp"
-        android:textAlignment="gravity" />
-
     <Button
         android:id="@+id/btnGo"
         android:layout_width="wrap_content"
@@ -62,4 +80,14 @@
         android:text="GET RECIPE"
         android:background="@drawable/button_gradient"
         android:layout_marginTop="15dp" />
+
+    <TextView
+        android:id="@+id/edtResp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:lines="6"
+        android:layout_below="@id/btnGo"
+        android:textColor="#ffffff"
+        android:textAlignment="gravity" />
 </RelativeLayout>

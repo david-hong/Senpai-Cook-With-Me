@@ -19,6 +19,33 @@
     android:layout_height="match_parent"
     tools:context=".ListViewAnimations" >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/buttons"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="New Recipe"
+            android:id="@+id/newRecip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+        <Button
+            android:text="Create"
+            android:id="@+id/create"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+        <Button
+            android:text="Bookmarks"
+            android:id="@+id/bookmarks"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+    </LinearLayout>
+
     <view
         class="com.example.feastbeast.BackgroundContainer"
         android:layout_width="match_parent"

@@ -1,7 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.feastbeast.MainActivity">
-    <item android:id="@+id/bookmarked"
-    android:title="Bookmarked"
-    android:orderInCategory="102"/>
 </menu>

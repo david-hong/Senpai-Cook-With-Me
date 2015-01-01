@@ -104,6 +104,51 @@ public class MainActivity extends Activity {
                     respText.setText("Error, only accepts valid recipes from food.com, foodnetwork.ca and allrecipes.com");
             }
         });
+
+        final Button newRecipe = (Button) findViewById(R.id.newRecip);
+        final Button create = (Button) findViewById(R.id.create);
+        final Button bookmarks = (Button) findViewById(R.id.bookmarks);
+
+        newRecipe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent mainAct = new Intent(MainActivity.this, MainActivity.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                mainAct.putExtra("opened", true);
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    mainAct.putExtra("bookmarked"+j, bookmarkss);
+                }
+                startActivity(mainAct);
+            }
+        });
+        create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent createAct = new Intent(MainActivity.this,NewRecipe.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    createAct.putExtra("bookmarked" + j, bookmarkss);
+                }
+                startActivity(createAct);
+            }
+        });
+        bookmarks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent bookmarkAct = new Intent(MainActivity.this, ListViewRemovalAnimation.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    bookmarkAct.putExtra("bookmarked" + j, bookmarkss);
+                }
+                startActivity(bookmarkAct);
+            }
+        });
     }
 
     @Override
@@ -210,19 +255,6 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-
-        MenuItem bookmarked = menu.findItem(R.id.bookmarked);
-        Intent intent2 = new Intent(this, ListViewRemovalAnimation.class);
-
-        //BOOKMARKS
-        Gson gs = new Gson();
-        String bookmarks;
-        for(int i = 0; i<recipes.size();i++){
-            bookmarks = gs.toJson(recipes.get(i));
-            intent2.putExtra("bookmarked"+i, bookmarks);
-        }
-        bookmarked.setIntent(intent2);
-
         return true;
     }
 

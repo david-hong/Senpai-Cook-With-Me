@@ -4,6 +4,33 @@
     tools:context="com.example.feastbeast.MainActivity"
     android:background="#ffffff">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/buttons"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="New Recipe"
+            android:id="@+id/newRecip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+        <Button
+            android:text="Create"
+            android:id="@+id/create"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+        <Button
+            android:text="Bookmarks"
+            android:id="@+id/bookmarks"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+    </LinearLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -11,7 +38,8 @@
         android:textStyle="bold"
         android:textColor="#000000"
         android:id="@+id/heading"
-        android:textSize="@dimen/titleSize"/>
+        android:textSize="@dimen/titleSize"
+        android:layout_below="@id/buttons"/>
 
     <fragment
         android:layout_below="@id/heading"
@@ -25,10 +53,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:id="@+id/buttons"
+        android:id="@+id/buttons2"
         android:layout_height="wrap_content"
         android:layout_below="@id/witButton">
-
         <Button
             android:text="Recipe"
             android:id="@+id/recipeBtn"
@@ -36,7 +63,6 @@
             android:layout_height="wrap_content"
             android:layout_weight=".50"
             android:background="#44b9cb"/>
-
         <Button
             android:text="Ingredients"
             android:id="@+id/ingredientsBtn"
@@ -44,7 +70,6 @@
             android:layout_height="wrap_content"
             android:layout_weight=".50"
             android:background="#2eaac0"/>
-
     </LinearLayout>
 
     <ScrollView
@@ -53,7 +78,7 @@
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
         android:fillViewport="true"
-        android:layout_below="@+id/buttons"
+        android:layout_below="@+id/buttons2"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
@@ -65,8 +90,8 @@
             android:layout_height="wrap_content"
             android:background="#ffffff"
             android:textSize="16dp"
-            android:text="The spoken text will show up here"
-            android:textColor="#000000" />
+            android:text="text"
+            android:textColor="#000000"/>
     </ScrollView>
 
 </RelativeLayout>

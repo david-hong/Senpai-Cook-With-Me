@@ -38,6 +38,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,7 +87,6 @@ public class ListViewRemovalAnimation extends Activity {
 
         mBackgroundContainer = (BackgroundContainer) findViewById(R.id.listViewBackground);
         mListView = (ListView) findViewById(R.id.listview);
-        android.util.Log.d("Debug", "d=" + mListView.getDivider());
 
         //GET BOOKMARKED
         Intent intent = getIntent();
@@ -106,20 +107,68 @@ public class ListViewRemovalAnimation extends Activity {
         mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Intent intent = new Intent(ListViewRemovalAnimation.this, NewRecipe.class);
-                intent.putExtra("title", recipes.get(position).toString());
-                intent.putExtra("recipe-directions", recipes.get(position).recipe.get(0));
+                Intent intent3 = new Intent(ListViewRemovalAnimation.this,NewRecipe.class);
+                intent3.putExtra("title", recipes.get(position).toString());
+                intent3.putExtra("recipe-directions", recipes.get(position).recipe.get(0));
                 for(int i = 1; i < recipes.get(position).recipe.size() + 1;i++){
-                    intent.putExtra("item"+i, recipes.get(position).recipe.get(i-1));
+                    intent3.putExtra("item"+i, recipes.get(position).recipe.get(i-1));
                 }
+
+                String[] strArrayHolder = new String[recipes.get(position).ingredints.size()];
+                intent3.putExtra("ingredients", recipes.get(position).ingredints.toArray(strArrayHolder));
 
                 Gson gs = new Gson();
                 String bookmarks;
                 for (int i = 0; i < recipes.size(); i++) {
                     bookmarks = gs.toJson(recipes.get(i));
-                    intent.putExtra("bookmarked" + i, bookmarks);
+                    intent3.putExtra("bookmarked" + i, bookmarks);
                 }
-                ListViewRemovalAnimation.this.startActivity(intent);
+                startActivity(intent3);
+            }
+        });
+
+        final Button newRecipe = (Button) findViewById(R.id.newRecip);
+        final Button create = (Button) findViewById(R.id.create);
+        final Button bookmarks = (Button) findViewById(R.id.bookmarks);
+
+        newRecipe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent mainAct = new Intent(ListViewRemovalAnimation.this, MainActivity.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                mainAct.putExtra("opened", true);
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    mainAct.putExtra("bookmarked"+j, bookmarkss);
+                }
+                startActivity(mainAct);
+            }
+        });
+        create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent createAct = new Intent(ListViewRemovalAnimation.this,NewRecipe.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    createAct.putExtra("bookmarked" + j, bookmarkss);
+                }
+                startActivity(createAct);
+            }
+        });
+        bookmarks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent bookmarkAct = new Intent(ListViewRemovalAnimation.this, ListViewRemovalAnimation.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    bookmarkAct.putExtra("bookmarked" + j, bookmarkss);
+                }
+                startActivity(bookmarkAct);
             }
         });
     }
@@ -154,20 +203,6 @@ public class ListViewRemovalAnimation extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_bookmarked, menu);
 
-        MenuItem newURL = menu.findItem(R.id.newURL);
-        Intent intent2 = new Intent(this, MainActivity.class);
-
-        //BOOKMARKS
-        Gson gs = new Gson();
-        String bookmarks;
-        for(int i = 0; i<recipes.size();i++){
-            bookmarks = gs.toJson(recipes.get(i));
-            intent2.putExtra("bookmarked"+i, bookmarks);
-        }
-        intent2.putExtra("opened", true);
-
-        newURL.setIntent(intent2);
-
         return true;
     }
 
@@ -179,6 +214,15 @@ public class ListViewRemovalAnimation extends Activity {
         int id = item.getItemId();
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showToast(String text) {
+        if (mToast == null) {
+            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        } else {
+            mToast.setText(text);
+        }
+        mToast.show();
     }
 
     /**
@@ -278,11 +322,11 @@ public class ListViewRemovalAnimation extends Activity {
                     }
                     else {
                         showToast("tapping");
-                        //openRecipe(mListView, v);
                         int position = mListView.pointToPosition((int) event.getX(), (int) event.getY());
                         if(position!=ListView.INVALID_POSITION){
                             mListView.performItemClick(mListView.getChildAt(position- mListView.getFirstVisiblePosition()), position, mListView.getItemIdAtPosition(position));
                         }
+                        break;
                     }
                 }
                 mItemPressed = false;
@@ -293,40 +337,6 @@ public class ListViewRemovalAnimation extends Activity {
             return true;
         }
     };
-
-    /*public void openRecipe(ListView listview, View recipeView){
-        int firstVisiblePosition = listview.getFirstVisiblePosition();
-        for (int i = 0; i < listview.getChildCount(); ++i) {
-            View child = listview.getChildAt(i);
-            if (child != recipeView) {
-                int position = firstVisiblePosition + i;
-                long itemId = mAdapter.getItemId(position);
-                mItemIdTopMap.put(itemId, child.getTop());
-            }
-        }
-        int position = mListView.getPositionForView(recipeView);
-
-        showToast("this far1");
-        Intent intent = new Intent(recipeView.getContext(), NewRecipe.class);
-        intent.putExtra("title", recipes.get(position).toString());
-        showToast("this far2");
-        intent.putExtra("recipe-directions", recipes.get(position).recipe.get(0));
-        showToast("this far3");
-        for(int i = 1; i < recipes.get(position).recipe.size() + 1;i++){
-                intent.putExtra("item"+i, recipes.get(position).recipe.get(i-1));
-        }
-        showToast("this far4");
-
-        Gson gs = new Gson();
-        String bookmarks;
-        for (int i = 0; i < recipes.size(); i++) {
-            bookmarks = gs.toJson(recipes.get(i));
-            intent.putExtra("bookmarked" + i, bookmarks);
-        }
-        showToast("this far5");
-
-        recipeView.getContext().startActivity(intent);
-    }*/
 
     /**
      * This method animates all other views in the ListView container (not including ignoreView)
@@ -403,16 +413,6 @@ public class ListViewRemovalAnimation extends Activity {
                 return true;
             }
         });
-        //refresh activity so recipes intent is updated? probably not if im going to use buttons, but might have to here. FOR LATER.
-    }
-
-    private void showToast(String text) {
-        if (mToast == null) {
-            mToast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        } else {
-            mToast.setText(text);
-        }
-        mToast.show();
     }
 
 }
