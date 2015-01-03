@@ -31,6 +31,10 @@
             android:name="com.example.feastbeast.ListViewRemovalAnimation"
             android:label="Bookmarked" >
         </activity>
+        <activity
+            android:name="com.example.feastbeast.CreateRecipe"
+            android:label="Create New Recipe" >
+        </activity>
     </application>
 
 </manifest>

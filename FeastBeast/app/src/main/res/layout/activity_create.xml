@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:paddingBottom="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/buttons"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="New Recipe"
+            android:id="@+id/newRecip"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+        <Button
+            android:text="Create"
+            android:id="@+id/create"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+        <Button
+            android:text="Bookmarks"
+            android:id="@+id/bookmarks"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#2eaac0"/>
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Title"
+        android:layout_below="@id/buttons"
+        android:id="@+id/getTitle"
+        android:textColor="#000000"
+        android:textSize="26dp"/>
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/getTitle"
+        android:id="@+id/getRecipe"
+        android:textColor="#333333"
+        android:hint="Enter recipe, enter for new line" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/getTitle"
+        android:id="@+id/getIngredients"
+        android:textColor="#333333"
+        android:hint="Enter ingredients, enter for new line"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/switchET"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/getRecipe"
+        android:textSize="20sp"
+        android:text="Ingredients"
+        android:background="@drawable/button_gradient"
+        android:layout_marginTop="15dp"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:id="@+id/add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Create"
+        android:background="@drawable/button_gradient"
+        android:layout_marginTop="15dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

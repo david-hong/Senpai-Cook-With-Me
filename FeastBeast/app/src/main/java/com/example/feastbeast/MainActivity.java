@@ -126,7 +126,7 @@ public class MainActivity extends Activity {
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Intent createAct = new Intent(MainActivity.this,NewRecipe.class);
+                final Intent createAct = new Intent(MainActivity.this,CreateRecipe.class);
                 Gson gs2 = new Gson();
                 String bookmarkss;
                 for(int j = 0; j<recipes.size();j++){
@@ -155,7 +155,7 @@ public class MainActivity extends Activity {
     protected void onResume(){
         super.onResume();
 
-        //GET BOOKMARKED FROM INTENT -- MOVE TO ONRESUME()
+        //GET BOOKMARKED FROM INTENT
         if (getIntent().getStringExtra("bookmarked"+0) != null)
             recipes = new ArrayList<Recipe>();
         Gson gs = new Gson();

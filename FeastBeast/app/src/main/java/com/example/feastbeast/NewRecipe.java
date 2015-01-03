@@ -303,7 +303,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Intent createAct = new Intent(NewRecipe.this,NewRecipe.class);
+                final Intent createAct = new Intent(NewRecipe.this,CreateRecipe.class);
                 Gson gs2 = new Gson();
                 String bookmarkss;
                 for(int j = 0; j<recipes.size();j++){

@@ -148,7 +148,7 @@ public class ListViewRemovalAnimation extends Activity {
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Intent createAct = new Intent(ListViewRemovalAnimation.this,NewRecipe.class);
+                final Intent createAct = new Intent(ListViewRemovalAnimation.this,CreateRecipe.class);
                 Gson gs2 = new Gson();
                 String bookmarkss;
                 for(int j = 0; j<recipes.size();j++){
@@ -321,11 +321,12 @@ public class ListViewRemovalAnimation extends Activity {
                                 });
                     }
                     else {
-                        showToast("tapping");
-                        int position = mListView.pointToPosition((int) event.getX(), (int) event.getY());
+                        int position = mListView.getPositionForView(v);
+
                         if(position!=ListView.INVALID_POSITION){
                             mListView.performItemClick(mListView.getChildAt(position- mListView.getFirstVisiblePosition()), position, mListView.getItemIdAtPosition(position));
                         }
+                        mItemPressed = false;
                         break;
                     }
                 }
