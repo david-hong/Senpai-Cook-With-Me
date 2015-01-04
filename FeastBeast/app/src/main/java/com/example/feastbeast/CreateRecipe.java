@@ -54,6 +54,7 @@ public class CreateRecipe extends Activity {
             recipes.add(gs.fromJson(gson, Recipe.class));
             i++;
         }
+
         final EditText getRecipe = (EditText) findViewById(R.id.getRecipe);
         final EditText getIngredients = (EditText) findViewById(R.id.getIngredients);
         final EditText getTitle = (EditText) findViewById(R.id.getTitle);
@@ -97,12 +98,21 @@ public class CreateRecipe extends Activity {
                     String[] lines2 = getIngredients.getText().toString().split("\\r?\\n");
                     temp2 = Arrays.asList(lines2);
 
-                    recipes.add(new Recipe(getTitle.getText().toString(), temp, temp2));
-                    showToast(recipes.size()+"");
+                    recipes.add(new Recipe(getTitle.getText().toString(), temp2, temp));
                 }
+                // START BOOKMARKED ACTIVITY
+                final Intent bookmarkAct = new Intent(CreateRecipe.this, ListViewRemovalAnimation.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    bookmarkAct.putExtra("bookmarked" + j, bookmarkss);
+                }
+                startActivity(bookmarkAct);
             }
         });
 
+        // NAV MENU
         final Button newRecipe = (Button) findViewById(R.id.newRecip);
         final Button create = (Button) findViewById(R.id.create);
         final Button bookmarks = (Button) findViewById(R.id.bookmarks);
@@ -131,6 +141,10 @@ public class CreateRecipe extends Activity {
                     bookmarkss = gs2.toJson(recipes.get(j));
                     createAct.putExtra("bookmarked" + j, bookmarkss);
                 }
+
+                if(!getTitle.getText().toString().isEmpty())
+                    createAct.putExtra("title", getTitle.getText().toString());
+
                 startActivity(createAct);
             }
         });
@@ -147,6 +161,30 @@ public class CreateRecipe extends Activity {
                 startActivity(bookmarkAct);
             }
         });
+
+        //IF EDITING
+        if(getIntent().getStringExtra("title") != null){
+            getTitle.setText(getIntent().getStringExtra("title"));
+
+            String holder = "";
+
+            List<String> listHolder = new ArrayList<String>();
+            listHolder = Arrays.asList(getIntent().getExtras().getStringArray("ingredients"));
+            for(int j = 0; j < listHolder.size(); j++){
+                holder = holder + listHolder.get(j);
+                if(j != listHolder.size() - 1)
+                    holder = holder + "\n";
+            }
+            getIngredients.setText(holder);
+
+            listHolder = Arrays.asList(getIntent().getExtras().getStringArray("directions"));
+            for(int j = 0; j < listHolder.size(); j++){
+                holder = holder + listHolder.get(j);
+                if(j != listHolder.size() - 1)
+                    holder = holder + "\n";
+            }
+            getRecipe.setText(holder);
+        }
     }
 
     @Override

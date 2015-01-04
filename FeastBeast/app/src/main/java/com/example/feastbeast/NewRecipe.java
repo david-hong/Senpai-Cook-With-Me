@@ -431,6 +431,29 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
                     bookmarked = true;
                 }
                 return true;
+            case R.id.edit:
+                Intent edit = new Intent(NewRecipe.this, CreateRecipe.class);
+
+                edit.putExtra("title", recipeName);
+
+                String[] strArrayHolder2 = new String[list.size()];
+                strArrayHolder2 = list.toArray(strArrayHolder2);
+                edit.putExtra("directions", strArrayHolder2);
+
+                String[] strArrayHolder = new String[ingredients.size()];
+                strArrayHolder = ingredients.toArray(strArrayHolder);
+                edit.putExtra("ingredients", strArrayHolder);
+
+                Gson gs = new Gson();
+                String bookmarks;
+
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarks = gs.toJson(recipes.get(j));
+                    edit.putExtra("bookmarked" + j, bookmarks);
+                }
+
+                startActivity(edit);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
