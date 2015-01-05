@@ -35,6 +35,11 @@ public class CreateRecipe extends Activity {
     public List<Recipe> recipes = new ArrayList<Recipe>();
     private Toast mToast;
 
+
+    EditText getRecipe;
+    EditText getIngredients;
+    EditText getTitle;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -55,60 +60,29 @@ public class CreateRecipe extends Activity {
             i++;
         }
 
-        final EditText getRecipe = (EditText) findViewById(R.id.getRecipe);
-        final EditText getIngredients = (EditText) findViewById(R.id.getIngredients);
-        final EditText getTitle = (EditText) findViewById(R.id.getTitle);
+        getRecipe = (EditText) findViewById(R.id.getRecipe);
+        getIngredients = (EditText) findViewById(R.id.getIngredients);
+        getTitle = (EditText) findViewById(R.id.getTitle);
 
-        final Button switcher = (Button) findViewById(R.id.switchET);
-        switcher.setOnClickListener(new View.OnClickListener() {
+        //SWITCHING
+        final Button recipesBtn = (Button) findViewById(R.id.recipeBtn);
+        final Button ingredientsBtn = (Button) findViewById(R.id.ingredientsBtn);
+        recipesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(switcher.getText().toString().equals("Ingredients")){
-                    switcher.setText("Recipe");
-                    getRecipe.setVisibility(View.INVISIBLE);
-                    getIngredients.setVisibility(View.VISIBLE);
-                }
-                else{
-                    switcher.setText("Ingredients");
-                    getRecipe.setVisibility(View.VISIBLE);
-                    getIngredients.setVisibility(View.INVISIBLE);
-                }
+                getRecipe.setVisibility(View.VISIBLE);
+                getIngredients.setVisibility(View.INVISIBLE);
+                recipesBtn.setBackgroundColor(Color.parseColor("#44b9cb"));
+                ingredientsBtn.setBackgroundColor(Color.parseColor("#2eaac0"));
             }
         });
-
-        final Button add = (Button) findViewById(R.id.add);
-        add.setOnClickListener(new View.OnClickListener() {
+        ingredientsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(getTitle.getText().toString().isEmpty()){
-                    showToast("Error enter a recipe title");
-                }
-                else if(getRecipe.getText().toString().isEmpty()){
-                    showToast("Error enter recipe directions");
-                }
-                else if(getIngredients.getText().toString().isEmpty()){
-                    showToast("Error enter ingredients");
-                }
-                else{
-                    List<String> temp = new ArrayList<String>();
-                    String[] lines = getRecipe.getText().toString().split("\\r?\\n");
-                    temp = Arrays.asList(lines);
-
-                    List<String> temp2 = new ArrayList<String>();
-                    String[] lines2 = getIngredients.getText().toString().split("\\r?\\n");
-                    temp2 = Arrays.asList(lines2);
-
-                    recipes.add(new Recipe(getTitle.getText().toString(), temp2, temp));
-                }
-                // START BOOKMARKED ACTIVITY
-                final Intent bookmarkAct = new Intent(CreateRecipe.this, ListViewRemovalAnimation.class);
-                Gson gs2 = new Gson();
-                String bookmarkss;
-                for(int j = 0; j<recipes.size();j++){
-                    bookmarkss = gs2.toJson(recipes.get(j));
-                    bookmarkAct.putExtra("bookmarked" + j, bookmarkss);
-                }
-                startActivity(bookmarkAct);
+                getRecipe.setVisibility(View.INVISIBLE);
+                getIngredients.setVisibility(View.VISIBLE);
+                recipesBtn.setBackgroundColor(Color.parseColor("#2eaac0"));
+                ingredientsBtn.setBackgroundColor(Color.parseColor("#44b9cb"));
             }
         });
 
@@ -177,6 +151,8 @@ public class CreateRecipe extends Activity {
             }
             getIngredients.setText(holder);
 
+            holder = "";
+
             listHolder = Arrays.asList(getIntent().getExtras().getStringArray("directions"));
             for(int j = 0; j < listHolder.size(); j++){
                 holder = holder + listHolder.get(j);
@@ -215,7 +191,7 @@ public class CreateRecipe extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_bookmarked, menu);
+        getMenuInflater().inflate(R.menu.menu_create, menu);
 
         return true;
     }
@@ -226,6 +202,40 @@ public class CreateRecipe extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+
+        switch (id) {
+            case R.id.add:
+                if(getTitle.getText().toString().isEmpty()){
+                    showToast("Error enter a recipe title");
+                }
+                else if(getRecipe.getText().toString().isEmpty()){
+                    showToast("Error enter recipe directions");
+                }
+                else if(getIngredients.getText().toString().isEmpty()){
+                    showToast("Error enter ingredients");
+                }
+                else{
+                    List<String> temp = new ArrayList<String>();
+                    String[] lines = getRecipe.getText().toString().split("\\r?\\n");
+                    temp = Arrays.asList(lines);
+
+                    List<String> temp2 = new ArrayList<String>();
+                    String[] lines2 = getIngredients.getText().toString().split("\\r?\\n");
+                    temp2 = Arrays.asList(lines2);
+
+                    recipes.add(new Recipe(getTitle.getText().toString(), temp2, temp));
+                }
+                // START BOOKMARKED ACTIVITY
+                final Intent bookmarkAct = new Intent(CreateRecipe.this, ListViewRemovalAnimation.class);
+                Gson gs2 = new Gson();
+                String bookmarkss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarkss = gs2.toJson(recipes.get(j));
+                    bookmarkAct.putExtra("bookmarked" + j, bookmarkss);
+                }
+                startActivity(bookmarkAct);
+                break;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -238,9 +248,4 @@ public class CreateRecipe extends Activity {
         }
         mToast.show();
     }
-
-    public void add(){
-        showToast("add");
-    }
-
 }

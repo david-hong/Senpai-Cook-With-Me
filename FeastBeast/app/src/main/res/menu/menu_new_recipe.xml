@@ -2,14 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.feastbeast.MainActivity">
+    <item android:id="@+id/bookmark"
+        android:icon="@drawable/unfave"
+        android:title="Bookmark"
+        app:showAsAction="always" />
     <item android:id="@+id/edit"
         android:title="Edit"
-        android:orderInCategory="90"/>
-    <item android:id="@+id/bookmark"
-        android:icon="@drawable/fave"
-        android:title="Bookmark"
-        android:showAsAction="ifRoom" />
+        android:icon="@drawable/edit"
+        app:showAsAction="always" />
     <item android:id="@+id/myo_connect"
         android:title="Connect Myo"
-        android:orderInCategory="100"/>
+        android:icon="@drawable/myo"
+        app:showAsAction="always" />
 </menu>

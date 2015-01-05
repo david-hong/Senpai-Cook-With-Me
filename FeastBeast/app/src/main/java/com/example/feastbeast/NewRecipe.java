@@ -197,8 +197,10 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
         final TextView title = (TextView) findViewById(R.id.heading);
         recipeName = intent.getExtras().getString("title");
-        if(!recipeName.isEmpty())
+        if(!recipeName.isEmpty()) {
             title.setText(recipeName);
+            setTitle(recipeName);
+        }
 
         int count = 0;
         String name = "recipe-directions";
@@ -404,8 +406,10 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
             bookmark.setTitle("Invalid URL");
         }
         else if (list!= null) {
-            if (bookmarked)
+            if (bookmarked) {
                 bookmark.setTitle("unbookmark");
+                bookmark.setIcon(R.drawable.fave);
+            }
         }
 
         return true;
@@ -424,11 +428,13 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
                     unbookmark();
                     item.setTitle("Bookmark");
                     bookmarked = false;
+                    item.setIcon(R.drawable.unfave);
                 }
                 else {
                     bookmark();
                     item.setTitle("Unbookmark");
                     bookmarked = true;
+                    item.setIcon(R.drawable.fave);
                 }
                 return true;
             case R.id.edit:

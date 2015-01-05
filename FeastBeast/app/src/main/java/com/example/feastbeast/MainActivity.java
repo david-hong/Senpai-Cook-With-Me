@@ -61,7 +61,6 @@ public class MainActivity extends Activity {
         if(! getIntent().getBooleanExtra("opened", false)) {
             try {
                 openFile("data");
-                showToast("opened");
             }
             catch(Exception e){
                 //file not found? RIP
@@ -95,13 +94,9 @@ public class MainActivity extends Activity {
                         siteUrl = "http://" + siteUrl;
                     (new ParseURL(view)).execute(new String[]{siteUrl});
                 }
-                else
-                    respText.setText("error, you need to enter a URL");
 
                 if(directions.current != null)
                     newRec(view);
-                else
-                    respText.setText("Error, only accepts valid recipes from food.com, foodnetwork.ca and allrecipes.com");
             }
         });
 
@@ -223,33 +218,36 @@ public class MainActivity extends Activity {
 
     //LOAD NEWRECIPE ACTIVITY
     public void newRec(View view){
-        Intent intent = new Intent(this,NewRecipe.class);
-        intent.putExtra("title", title);
+        if(directions.current != null) {
+            Intent intent = new Intent(this, NewRecipe.class);
+            intent.putExtra("title", title);
 
-        int count = 0;
-        String name = "recipe-directions";
+            int count = 0;
+            String name = "recipe-directions";
 
-        intent.putExtra(name,"Senpye you did not enter a recipe");
-        while (directions.current != null)
-        {
-            intent.putExtra(name, directions.current.value);
-            count++;
-            name="item"+count;
-            directions.current=directions.current.next;
+            intent.putExtra(name, "Senpye you did not enter a recipe");
+            while (directions.current != null) {
+                intent.putExtra(name, directions.current.value);
+                count++;
+                name = "item" + count;
+                directions.current = directions.current.next;
+            }
+            String[] strArrayHolder = new String[ingredients.size()];
+            strArrayHolder = ingredients.toArray(strArrayHolder);
+            intent.putExtra("ingredients", strArrayHolder);
+
+            Gson gs = new Gson();
+            String bookmarked;
+
+            for (int i = 0; i < recipes.size(); i++) {
+                bookmarked = gs.toJson(recipes.get(i));
+                intent.putExtra("bookmarked" + i, bookmarked);
+            }
+
+            startActivity(intent);
         }
-        String[] strArrayHolder = new String[ingredients.size()];
-        strArrayHolder = ingredients.toArray(strArrayHolder);
-        intent.putExtra("ingredients",strArrayHolder);
-
-        Gson gs = new Gson();
-        String bookmarked;
-
-        for(int i = 0; i<recipes.size();i++){
-            bookmarked = gs.toJson(recipes.get(i));
-            intent.putExtra("bookmarked"+i, bookmarked);
-        }
-
-        startActivity(intent);
+        else
+            showToast("Invalid recipe URL");
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -353,12 +351,12 @@ public class MainActivity extends Activity {
                 Elements topicList = doc.select(classFind);
                 if(!buffer.toString().equals("Error only accepts recipes from http://www.foodnetwork.ca/, http://allrecipes.com/, http://www.food.com/")){
                     buffer.append("Directions \r\n");
-                      for (Element topic : topicList) {
-                          String data = topic.text();
-                          directions.add(data);
-                          buffer.append(data + "\r\n");
-                      }
+                    for (Element topic : topicList) {
+                        String data = topic.text();
+                        directions.add(data);
+                        buffer.append(data + "\r\n");
                     }
+                }
 
                 // GET INGREDIENTS
                 buffer = new StringBuffer();
@@ -386,7 +384,6 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            respText.setText(s);
             newRec(view);
         }
     }
