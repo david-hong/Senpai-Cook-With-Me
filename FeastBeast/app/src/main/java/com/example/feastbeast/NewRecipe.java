@@ -450,6 +450,8 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
                 strArrayHolder = ingredients.toArray(strArrayHolder);
                 edit.putExtra("ingredients", strArrayHolder);
 
+                recipes.remove(titles.indexOf(recipeName));
+
                 Gson gs = new Gson();
                 String bookmarks;
 

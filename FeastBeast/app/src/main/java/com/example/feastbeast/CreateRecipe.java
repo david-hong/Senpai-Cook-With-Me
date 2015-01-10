@@ -98,6 +98,17 @@ public class CreateRecipe extends Activity {
                 Gson gs2 = new Gson();
                 String bookmarkss;
                 mainAct.putExtra("opened", true);
+
+                List<String> temp = new ArrayList<String>();
+                String[] lines = getRecipe.getText().toString().split("\\r?\\n");
+                temp = Arrays.asList(lines);
+
+                List<String> temp2 = new ArrayList<String>();
+                String[] lines2 = getIngredients.getText().toString().split("\\r?\\n");
+                temp2 = Arrays.asList(lines2);
+
+                recipes.add(new Recipe(getTitle.getText().toString(), temp2, temp));
+
                 for(int j = 0; j<recipes.size();j++){
                     bookmarkss = gs2.toJson(recipes.get(j));
                     mainAct.putExtra("bookmarked"+j, bookmarkss);
@@ -111,6 +122,17 @@ public class CreateRecipe extends Activity {
                 final Intent createAct = new Intent(CreateRecipe.this,CreateRecipe.class);
                 Gson gs2 = new Gson();
                 String bookmarkss;
+
+                List<String> temp = new ArrayList<String>();
+                String[] lines = getRecipe.getText().toString().split("\\r?\\n");
+                temp = Arrays.asList(lines);
+
+                List<String> temp2 = new ArrayList<String>();
+                String[] lines2 = getIngredients.getText().toString().split("\\r?\\n");
+                temp2 = Arrays.asList(lines2);
+
+                recipes.add(new Recipe(getTitle.getText().toString(), temp2, temp));
+
                 for(int j = 0; j<recipes.size();j++){
                     bookmarkss = gs2.toJson(recipes.get(j));
                     createAct.putExtra("bookmarked" + j, bookmarkss);
@@ -128,6 +150,17 @@ public class CreateRecipe extends Activity {
                 final Intent bookmarkAct = new Intent(CreateRecipe.this, ListViewRemovalAnimation.class);
                 Gson gs2 = new Gson();
                 String bookmarkss;
+
+                List<String> temp = new ArrayList<String>();
+                String[] lines = getRecipe.getText().toString().split("\\r?\\n");
+                temp = Arrays.asList(lines);
+
+                List<String> temp2 = new ArrayList<String>();
+                String[] lines2 = getIngredients.getText().toString().split("\\r?\\n");
+                temp2 = Arrays.asList(lines2);
+
+                recipes.add(new Recipe(getTitle.getText().toString(), temp2, temp));
+
                 for(int j = 0; j<recipes.size();j++){
                     bookmarkss = gs2.toJson(recipes.get(j));
                     bookmarkAct.putExtra("bookmarked" + j, bookmarkss);
@@ -174,6 +207,29 @@ public class CreateRecipe extends Activity {
         }
 
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy(){
+        List<String> temp = new ArrayList<String>();
+        String[] lines = getRecipe.getText().toString().split("\\r?\\n");
+        temp = Arrays.asList(lines);
+
+        List<String> temp2 = new ArrayList<String>();
+        String[] lines2 = getIngredients.getText().toString().split("\\r?\\n");
+        temp2 = Arrays.asList(lines2);
+
+        recipes.add(new Recipe(getTitle.getText().toString(), temp2, temp));
+
+        try {
+            FileOutputStream output = getApplicationContext().openFileOutput("data", Context.MODE_PRIVATE);
+            writeJsonStream(output, recipes);
+            output.close();
+        }
+        catch(Exception e){
+        }
+
+        super.onDestroy();
     }
 
     public void writeJsonStream(OutputStream out, List<Recipe> messages) throws IOException {

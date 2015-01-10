@@ -336,11 +336,29 @@ public class MainActivity extends Activity {
                     classFind = ".recipeInstructions p";
                     ingredientsFind = ".recipe-ingredients p";
                 }
+                else if(strings[0].substring(0, Math.min(strings[0].length(), 22)).equals("http://foodnetwork.ca/")) {
+                    classFind = ".recipeInstructions p";
+                    ingredientsFind = ".recipe-ingredients p";
+                }
+                else if(strings[0].substring(0, Math.min(strings[0].length(), 24)).equals("http://m.allrecipes.com/")) {
+                    classFind = ".recipe-directions__list span";
+                    ingredientsFind = ".recipe-ingred_txt";
+                }
+                else if(strings[0].substring(0, Math.min(strings[0].length(), 28)).equals("http://www.m.allrecipes.com/")) {
+                    classFind = ".recipe-directions__list span";
+                    ingredientsFind = ".recipe-ingred_txt";
+                }
                 else if(strings[0].substring(0, Math.min(strings[0].length(), 22)).equals("http://allrecipes.com/")) {
                     classFind = ".directions li";
+                    ingredientsFind = ".ingred-left .fl-ing";
+                }
+                else if(strings[0].substring(0, Math.min(strings[0].length(), 26)).equals("http://www.allrecipes.com/")) {
+                    classFind = ".directions li";
+                    ingredientsFind = ".ingred-left .fl-ing";
                 }
                 else if(strings[0].substring(0, Math.min(strings[0].length(), 20)).equals("http://www.food.com/")) {
                     classFind = ".instructions li";
+                    ingredientsFind = ".pod.ingredients li";
                 }
                 else {
                     buffer.setLength(0);
