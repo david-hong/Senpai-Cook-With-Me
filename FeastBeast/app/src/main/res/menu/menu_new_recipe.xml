@@ -14,4 +14,6 @@
         android:title="Connect Myo"
         android:icon="@drawable/myo"
         app:showAsAction="always" />
+    <item android:id="@+id/help"
+        android:title="Help"/>
 </menu>

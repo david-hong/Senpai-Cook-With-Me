@@ -171,6 +171,7 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
         int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
         TextView titleText = (TextView)findViewById(titleId);
         titleText.setTextColor(Color.parseColor("#000000"));
+        getActionBar().setIcon(android.R.color.transparent);
 
         // First, we initialize the Hub singleton with an application identifier.
         Hub hub = Hub.getInstance();
@@ -462,6 +463,16 @@ public class NewRecipe extends ActionBarActivity implements IWitListener, TextTo
 
                 startActivity(edit);
                 return true;
+            case R.id.help:
+                //START ACTIVITY & SEND DATA
+                final Intent help = new Intent(NewRecipe.this, help.class);
+                Gson gs3 = new Gson();
+                String bookmarksss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarksss = gs3.toJson(recipes.get(j));
+                    help.putExtra("bookmarked" + j, bookmarksss);
+                }
+                startActivity(help);
         }
 
         return super.onOptionsItemSelected(item);

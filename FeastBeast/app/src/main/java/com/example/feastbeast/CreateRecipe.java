@@ -50,6 +50,7 @@ public class CreateRecipe extends Activity {
         int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
         TextView titleText = (TextView)findViewById(titleId);
         titleText.setTextColor(Color.parseColor("#000000"));
+        getActionBar().setIcon(android.R.color.transparent);
 
         //GET BOOKMARKED
         Gson gs = new Gson();
@@ -290,6 +291,17 @@ public class CreateRecipe extends Activity {
                     bookmarkAct.putExtra("bookmarked" + j, bookmarkss);
                 }
                 startActivity(bookmarkAct);
+                break;
+            case R.id.help:
+                //START ACTIVITY & SEND DATA
+                final Intent help = new Intent(CreateRecipe.this, help.class);
+                Gson gs3 = new Gson();
+                String bookmarksss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarksss = gs3.toJson(recipes.get(j));
+                    help.putExtra("bookmarked" + j, bookmarksss);
+                }
+                startActivity(help);
                 break;
         }
 

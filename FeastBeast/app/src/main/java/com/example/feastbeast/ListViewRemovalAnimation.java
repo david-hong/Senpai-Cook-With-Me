@@ -84,6 +84,7 @@ public class ListViewRemovalAnimation extends Activity {
         int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
         TextView titleText = (TextView)findViewById(titleId);
         titleText.setTextColor(Color.parseColor("#000000"));
+        getActionBar().setIcon(android.R.color.transparent);
 
         mBackgroundContainer = (BackgroundContainer) findViewById(R.id.listViewBackground);
         mListView = (ListView) findViewById(R.id.listview);
@@ -201,7 +202,7 @@ public class ListViewRemovalAnimation extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_bookmarked, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
 
         return true;
     }
@@ -212,7 +213,18 @@ public class ListViewRemovalAnimation extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        switch (id) {
+            case R.id.help:
+                //START ACTIVITY & SEND DATA
+                final Intent help = new Intent(ListViewRemovalAnimation.this, help.class);
+                Gson gs3 = new Gson();
+                String bookmarksss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarksss = gs3.toJson(recipes.get(j));
+                    help.putExtra("bookmarked" + j, bookmarksss);
+                }
+                startActivity(help);
+        }
         return super.onOptionsItemSelected(item);
     }
 

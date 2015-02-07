@@ -72,6 +72,7 @@ public class MainActivity extends Activity {
         int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
         TextView titleText = (TextView)findViewById(titleId);
         titleText.setTextColor(Color.parseColor("#000000"));
+        getActionBar().setIcon(android.R.color.transparent);
 
         //INITIALIZE FONTS
         Typeface brandonGrotesque = Typeface.createFromAsset(getAssets(), "fonts/Brandon_blk.otf");
@@ -94,6 +95,8 @@ public class MainActivity extends Activity {
                         siteUrl = "http://" + siteUrl;
                     (new ParseURL(view)).execute(new String[]{siteUrl});
                 }
+                else
+                    showToast("Enter a URL");
 
                 if(directions.current != null)
                     newRec(view);
@@ -262,7 +265,18 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        switch (id) {
+            case R.id.help:
+                //START ACTIVITY & SEND DATA
+                final Intent help = new Intent(MainActivity.this, help.class);
+                Gson gs3 = new Gson();
+                String bookmarksss;
+                for(int j = 0; j<recipes.size();j++){
+                    bookmarksss = gs3.toJson(recipes.get(j));
+                    help.putExtra("bookmarked" + j, bookmarksss);
+                }
+                startActivity(help);
+        }
         return super.onOptionsItemSelected(item);
     }
 
